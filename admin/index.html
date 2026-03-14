@@ -23,6 +23,9 @@ if (window.netlifyIdentity) {
       });
     }
   });
+
+  // handle invite / recovery links
+  window.netlifyIdentity.on("open", () => console.log("Identity widget opened"));
 }
 </script>
 
