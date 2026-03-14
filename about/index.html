@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>About | Infonions</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 
@@ -17,31 +18,73 @@ color:#f0f0f5;
 margin:0;
 }
 
+/* background grid */
+.bg-grid{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background-image:
+linear-gradient(#14141f 1px, transparent 1px),
+linear-gradient(90deg,#14141f 1px,transparent 1px);
+background-size:50px 50px;
+opacity:.3;
+z-index:0;
+}
+
+/* header */
 header{
-padding:20px 30px;
+position:sticky;
+top:0;
+background:#0a0a0f;
 border-bottom:1px solid #1f1f2e;
+z-index:100;
+}
+
+.header-content{
+max-width:1200px;
+margin:auto;
+padding:20px 30px;
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
 
 .logo{
-font-size:22px;
+font-size:24px;
 font-weight:700;
 }
 
+nav a{
+color:#a0a0b0;
+text-decoration:none;
+margin-left:25px;
+}
+
+nav a:hover{
+color:#00d9ff;
+}
+
+/* page container */
+
 .container{
+position:relative;
+z-index:1;
 max-width:900px;
 margin:auto;
-padding:60px 30px;
+padding:80px 30px;
 line-height:1.7;
 }
 
 h1{
-font-size:48px;
+font-size:52px;
 margin-bottom:30px;
 }
 
 p{
-margin-bottom:20px;
 color:#a0a0b0;
+margin-bottom:20px;
 }
 
 ul{
@@ -52,9 +95,19 @@ li{
 margin-bottom:10px;
 }
 
-.back{
-margin-top:40px;
-display:inline-block;
+.contact{
+margin-top:60px;
+padding:30px;
+border:1px solid #1f1f2e;
+border-radius:12px;
+background:#0a0a0f;
+}
+
+.contact h2{
+margin-top:0;
+}
+
+.contact a{
 color:#00d9ff;
 text-decoration:none;
 }
@@ -64,9 +117,23 @@ text-decoration:none;
 
 <body>
 
+<div class="bg-grid"></div>
+
 <header>
+<div class="header-content">
+
 <div class="logo">INFONIONS</div>
+
+<nav>
+<a href="/">Home</a>
+<a href="/insights">Insights</a>
+<a href="/signals">Signals</a>
+<a href="/about">About</a>
+</nav>
+
+</div>
 </header>
+
 
 <div class="container">
 
@@ -77,17 +144,17 @@ Infonions is a digital platform designed to organize information in a way that h
 </p>
 
 <p>
-Modern information environments produce an enormous volume of updates every day. The challenge is not access to information — it is interpretation.
+Modern information environments generate an enormous volume of updates every day. The challenge today is no longer access to information — it is interpretation.
 </p>
 
 <p>
-Infonions addresses this challenge through two complementary formats:
+Infonions approaches this challenge through a layered format that allows readers to engage with information at different levels of depth.
 </p>
 
 <ul>
-<li><strong>Pulse</strong> – concise updates highlighting the key signal in a development.</li>
-<li><strong>Deep Dive</strong> – detailed analysis explaining the broader context.</li>
-<li><strong>Signals</strong> – community input reflecting how people interpret events.</li>
+<li><strong>Pulse</strong> — concise updates highlighting the key signal in a development.</li>
+<li><strong>Deep Dive</strong> — detailed analysis explaining the broader context.</li>
+<li><strong>Signals</strong> — community responses reflecting how people interpret events.</li>
 </ul>
 
 <p>
@@ -98,7 +165,25 @@ By combining quick signals with deeper analysis, Infonions allows readers to cho
 The platform focuses on developments shaping technology, economics, policy and society.
 </p>
 
-<a class="back" href="/">← Back to Home</a>
+
+<div class="contact">
+
+<h2>Contact</h2>
+
+<p>
+For editorial inquiries, feedback, or collaboration opportunities,
+you can reach the Infonions team at:
+</p>
+
+<p>
+Email: <a href="mailto:contact@infonions.com">contact@infonions.com</a>
+</p>
+
+<p>
+You can also connect through our social platforms as the project evolves.
+</p>
+
+</div>
 
 </div>
 
