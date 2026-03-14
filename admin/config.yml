@@ -1,0 +1,217 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "public/images"
+public_folder: "/images"
+
+publish_mode: editorial_workflow
+
+collections:
+  # PULSE - Short Format (40 words)
+  - name: "pulse"
+    label: "📡 Pulse (Short Format)"
+    folder: "content/pulse"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    editor:
+      preview: true
+    fields:
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options:
+          - {label: "Politics 🏛️", value: "politics"}
+          - {label: "Economy 💰", value: "economy"}
+          - {label: "Tech 💻", value: "tech"}
+          - {label: "Society 🌍", value: "society"}
+      
+      - label: "Pulse Content"
+        name: "pulse"
+        widget: "text"
+        hint: "Maximum 40 words - crisp, fearless, to the point"
+        pattern: ['^(\S+\s+){0,39}\S+$', "Must be 40 words or less"]
+      
+      - label: "Has Deep Dive?"
+        name: "hasDeepDive"
+        widget: "boolean"
+        default: false
+        hint: "Check if this has a corresponding long-form article"
+      
+      - label: "Deep Dive ID (if exists)"
+        name: "deepDiveId"
+        widget: "string"
+        required: false
+        hint: "Link to corresponding deep dive article"
+      
+      - {label: "Author", name: "author", widget: "string", default: "Infonions Desk"}
+      - {label: "Publish Date", name: "date", widget: "datetime"}
+      - {label: "Priority", name: "priority", widget: "number", default: 0}
+      - {label: "Featured", name: "featured", widget: "boolean", default: false}
+      - {label: "Status", name: "status", widget: "select", options: ["draft", "published"]}
+      
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        required: false
+
+  # DEEP DIVE - Long Format
+  - name: "deepdive"
+    label: "🔍 Deep Dive (Long Format)"
+    folder: "content/deepdive"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    editor:
+      preview: true
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options:
+          - {label: "Politics 🏛️", value: "politics"}
+          - {label: "Economy 💰", value: "economy"}
+          - {label: "Tech 💻", value: "tech"}
+          - {label: "Society 🌍", value: "society"}
+      
+      - label: "Excerpt"
+        name: "excerpt"
+        widget: "text"
+        hint: "2-3 sentence summary for article preview"
+      
+      - label: "Content"
+        name: "body"
+        widget: "markdown"
+        hint: "Full article - fearless, detailed, data-backed"
+      
+      - {label: "Featured Image", name: "image", widget: "image", required: false}
+      - {label: "Image Caption", name: "imageCaption", widget: "string", required: false}
+      
+      - {label: "Author", name: "author", widget: "string", default: "Infonions Desk"}
+      
+      - label: "Co-authors"
+        name: "coAuthors"
+        widget: "list"
+        required: false
+        field: {label: "Name", name: "name", widget: "string"}
+      
+      - {label: "Publish Date", name: "date", widget: "datetime"}
+      
+      - label: "Sources"
+        name: "sources"
+        widget: "list"
+        required: false
+        fields:
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "URL", name: "url", widget: "string"}
+      
+      - label: "Key Takeaways"
+        name: "keyTakeaways"
+        widget: "list"
+        required: false
+        hint: "3-5 bullet points of main insights"
+        field: {label: "Takeaway", name: "takeaway", widget: "string"}
+      
+      - label: "Data Points"
+        name: "dataPoints"
+        widget: "list"
+        required: false
+        hint: "Key statistics/numbers referenced in article"
+        fields:
+          - {label: "Label", name: "label", widget: "string"}
+          - {label: "Value", name: "value", widget: "string"}
+          - {label: "Source", name: "source", widget: "string"}
+      
+      - {label: "Priority", name: "priority", widget: "number", default: 0}
+      - {label: "Featured", name: "featured", widget: "boolean", default: false}
+      - {label: "Status", name: "status", widget: "select", options: ["draft", "published"]}
+      
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        required: false
+      
+      - label: "SEO"
+        name: "seo"
+        widget: "object"
+        required: false
+        fields:
+          - {label: "Meta Description", name: "description", widget: "text"}
+          - {label: "Keywords", name: "keywords", widget: "list"}
+
+  # SIGNALS - Polls/Surveys
+  - name: "signals"
+    label: "📊 Signals (Polls)"
+    folder: "content/signals"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Question", name: "question", widget: "text"}
+      
+      - label: "Type"
+        name: "type"
+        widget: "select"
+        options: ["poll", "survey", "quick_vote"]
+      
+      - label: "Options"
+        name: "options"
+        widget: "list"
+        min: 2
+        max: 5
+        field: {label: "Option", name: "option", widget: "string"}
+      
+      - {label: "Duration (hours)", name: "duration", widget: "number", default: 24}
+      - {label: "Target Responses", name: "target", widget: "number", default: 1000}
+      
+      - label: "Related Content"
+        name: "relatedContent"
+        widget: "relation"
+        collection: "pulse"
+        search_fields: ["pulse"]
+        value_field: "{{slug}}"
+        required: false
+      
+      - {label: "Status", name: "status", widget: "select", options: ["draft", "active", "closed"]}
+
+  # Settings
+  - name: "settings"
+    label: "⚙️ Settings"
+    files:
+      - label: "Site Settings"
+        name: "site"
+        file: "content/settings/site.yml"
+        fields:
+          - {label: "Site Name", name: "siteName", widget: "string", default: "Infonions"}
+          - {label: "Tagline", name: "tagline", widget: "string", default: "Fearless Intelligence"}
+          - {label: "Description", name: "description", widget: "text"}
+          
+          - label: "Social Media"
+            name: "social"
+            widget: "object"
+            fields:
+              - {label: "Twitter", name: "twitter", widget: "string", required: false}
+              - {label: "LinkedIn", name: "linkedin", widget: "string", required: false}
+              - {label: "Instagram", name: "instagram", widget: "string", required: false}
+          
+          - label: "Analytics"
+            name: "analytics"
+            widget: "object"
+            fields:
+              - {label: "Google Analytics ID", name: "gaId", widget: "string", required: false}
+              - {label: "Enable Tracking", name: "enableTracking", widget: "boolean", default: true}
+      
+      - label: "Author Profiles"
+        name: "authors"
+        file: "content/settings/authors.yml"
+        fields:
+          - label: "Authors"
+            name: "authors"
+            widget: "list"
+            fields:
+              - {label: "Name", name: "name", widget: "string"}
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Bio", name: "bio", widget: "text"}
+              - {label: "Avatar", name: "avatar", widget: "image", required: false}
+              - {label: "Twitter", name: "twitter", widget: "string", required: false}
