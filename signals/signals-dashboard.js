@@ -428,7 +428,7 @@ console.log('📊 Use getAnalytics() to view collected data');
 
 async function loadSignalsFromCMS() {
     try {
-        const res = await fetch("https://api.github.com/repos/SohailUlla/infonions/contents/content/signals");
+        const res = await fetch("https://api.github.com/repos/SohailUlla/infonions/content/signals/first-signal.md");
         const files = await res.json();
         files.sort((a, b) => new Date(b.name) - new Date(a.name));
         const container = document.getElementById("signals-container");
