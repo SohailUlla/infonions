@@ -427,16 +427,24 @@ console.log('📊 Use getAnalytics() to view collected data');
 // ============================================
 
 async function loadSignalsFromCMS() {
+    const container = document.getElementById("signals-container");
+
+    container.innerHTML = "Loading signals...";
+
     try {
-        const res = await fetch("https://api.github.com/repos/SohailUlla/infonions/content/signals/first-signal.md");
+        const res = await fetch("https://api.github.com/repos/SohailUlla/infonions/contents/content/signals");
+
+        if (!res.ok) {
+            throw new Error("GitHub API error: " + res.status);
+        }
+
         const files = await res.json();
-        files.sort((a, b) => new Date(b.name) - new Date(a.name));
-        const container = document.getElementById("signals-container");
-        if (!container) return;
 
         container.innerHTML = "";
 
         for (let file of files) {
+            if (!file.name.endsWith(".md")) continue;
+
             const raw = await fetch(file.download_url);
             const md = await raw.text();
 
@@ -444,7 +452,8 @@ async function loadSignalsFromCMS() {
         }
 
     } catch (err) {
-        console.error("CMS Load Error:", err);
+        console.error(err);
+        container.innerHTML = "⚠️ Failed to load signals";
     }
 }
 
