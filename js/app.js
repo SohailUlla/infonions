@@ -28,20 +28,22 @@ function setupModeSwitcher() {
     });
 }
 
-// Load pulse
+// Loadpulse
 async function loadPulse() {
     const container = document.getElementById('feedContainer');
 
     container.innerHTML = loadingUI();
 
     try {
-        const res = await fetch("https://api.github.com/repos/SohailUlla/infonions/contents/content/pulse");
-        const files = await res.json();
+        const files = [
+            {
+                download_url: "https://raw.githubusercontent.com/SohailUlla/infonions/main/content/pulse/first-pulse.md"
+            }
+        ];
 
         container.innerHTML = `<div class="pulse-feed" id="pulseFeed"></div>`;
 
         for (let file of files) {
-            if (!file.name.endsWith(".md")) continue;
 
             const raw = await fetch(file.download_url);
             const md = await raw.text();
