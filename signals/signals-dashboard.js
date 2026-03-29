@@ -453,10 +453,18 @@ function parseFrontmatter(md) {
     const match = md.match(/---([\s\S]*?)---/);
     if (!match) return {};
 
+    const yaml = match[1];
+
     let data = {};
-    match[1].split("\n").forEach(line => {
-        const [key, ...rest] = line.split(":");
-        if (key) data[key.trim()] = rest.join(":").trim();
+
+    yaml.split("\n").forEach(line => {
+        if (!line.includes(":")) return;
+
+        const index = line.indexOf(":");
+        const key = line.slice(0, index).trim();
+        const value = line.slice(index + 1).trim();
+
+        data[key] = value;
     });
 
     return data;
