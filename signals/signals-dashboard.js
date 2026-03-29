@@ -422,3 +422,69 @@ console.log('🚀 Signals Dashboard initialized');
 console.log('💡 Invisible tracking active');
 console.log('🤖 AI insights running');
 console.log('📊 Use getAnalytics() to view collected data');
+// ============================================
+// CMS SIGNALS INTEGRATION (NEW)
+// ============================================
+
+async function loadSignalsFromCMS() {
+    try {
+        const res = await fetch("https://api.github.com/repos/SohailUlla/infonions/contents/content/signals");
+        const files = await res.json();
+
+        const container = document.getElementById("signals-container");
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        for (let file of files) {
+            const raw = await fetch(file.download_url);
+            const md = await raw.text();
+
+            renderSignalCard(md);
+        }
+
+    } catch (err) {
+        console.error("CMS Load Error:", err);
+    }
+}
+
+// Parse markdown frontmatter
+function parseFrontmatter(md) {
+    const match = md.match(/---([\s\S]*?)---/);
+    if (!match) return {};
+
+    let data = {};
+    match[1].split("\n").forEach(line => {
+        const [key, ...rest] = line.split(":");
+        if (key) data[key.trim()] = rest.join(":").trim();
+    });
+
+    return data;
+}
+
+// Render signal card
+function renderSignalCard(md) {
+    const data = parseFrontmatter(md);
+
+    const div = document.createElement("div");
+    div.className = "signal-card";
+
+    div.innerHTML = `
+        <div style="margin-bottom:10px;">
+            <span style="color:#00d9ff;">${data.category || ""}</span> | 
+            <span style="color:#b026ff;">${data.type || ""}</span>
+        </div>
+
+        <h3>${data.title || "Untitled Signal"}</h3>
+
+        <p style="color:#60a5fa;">⚡ ${data.pulse || ""}</p>
+        <p style="color:#a78bfa;">🧠 ${data.insight || ""}</p>
+
+        <div style="font-size:12px; opacity:0.7;">
+            📊 ${data.impact_short || ""} / ${data.impact_long || ""}
+        </div>
+    `;
+
+    document.getElementById("signals-container").appendChild(div);
+}
+loadSignalsFromCMS();
