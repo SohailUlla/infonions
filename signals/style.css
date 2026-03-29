@@ -11,3 +11,64 @@
     transform: translateY(-4px);
     border-color: var(--electric-blue);
 }
+
+.signal-card {
+    background: linear-gradient(135deg, #14141f, #1f1f2e);
+    border: 1px solid #2a2a3e;
+    padding: 20px;
+    margin-bottom: 16px;
+    border-radius: 16px;
+    transition: 0.3s;
+}
+
+.signal-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 0 25px rgba(0,217,255,0.2);
+}
+
+.signal-meta {
+    margin-bottom: 10px;
+}
+
+.badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 10px;
+    margin-right: 8px;
+}
+
+.badge.category {
+    background: rgba(0,217,255,0.1);
+    color: #00d9ff;
+}
+
+.badge.type {
+    background: rgba(176,38,255,0.1);
+    color: #b026ff;
+}
+
+.signal-title {
+    font-size: 20px;
+    margin: 10px 0;
+}
+
+.signal-pulse {
+    color: #60a5fa;
+    margin-bottom: 8px;
+}
+
+.signal-insight {
+    color: #a78bfa;
+}
+
+.signal-impact {
+    margin-top: 10px;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.signal-why {
+    color: #00ff88;
+    font-size: 14px;
+    margin-top: 8px;
+}
