@@ -430,7 +430,7 @@ async function loadSignalsFromCMS() {
     try {
         const res = await fetch("https://api.github.com/repos/SohailUlla/infonions/contents/content/signals");
         const files = await res.json();
-
+        files.sort((a, b) => new Date(b.name) - new Date(a.name));
         const container = document.getElementById("signals-container");
         if (!container) return;
 
@@ -478,21 +478,27 @@ function renderSignalCard(md) {
     div.className = "signal-card";
 
     div.innerHTML = `
-        <div style="margin-bottom:10px;">
-            <span style="color:#00d9ff;">${data.category || ""}</span> | 
-            <span style="color:#b026ff;">${data.type || ""}</span>
-        </div>
+        <div class="signal-meta">
+        <span class="badge category">${data.category}</span>
+        <span class="badge type">${data.type}</span>
+    </div>
 
-        <h3>${data.title || "Untitled Signal"}</h3>
+    <h2 class="signal-title">${data.title}</h2>
 
-        <p style="color:#60a5fa;">⚡ ${data.pulse || ""}</p>
-        <p style="color:#a78bfa;">🧠 ${data.insight || ""}</p>
+    <p class="signal-pulse">⚡ ${data.pulse}</p>
 
-        <div style="font-size:12px; opacity:0.7;">
-            📊 ${data.impact_short || ""} / ${data.impact_long || ""}
-        </div>
-    `;
+    <p class="signal-insight">🧠 ${data.insight}</p>
 
+    <p class="signal-why">🎯 ${data.why || ""}</p>
+
+    <div class="signal-impact">
+        📊 <span>${data.impact_short}</span> / <span>${data.impact_long}</span>
+    </div>
+`;
+document.getElementById("signals-container").innerHTML = "Loading signals...";
+    if (files.length === 0) {
+    container.innerHTML = "No signals yet.";
+}
     document.getElementById("signals-container").appendChild(div);
 }
 loadSignalsFromCMS();
