@@ -1,0 +1,13 @@
+.signal-card {
+    background: var(--midnight);
+    border: 1px solid var(--slate);
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    transition: 0.3s;
+}
+
+.signal-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--electric-blue);
+}
