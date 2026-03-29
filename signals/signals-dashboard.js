@@ -444,10 +444,8 @@ async function loadSignalsFromCMS() {
 
         for (let file of files) {
             if (!file.name.endsWith(".md")) continue;
-
-            const raw = await fetch(file.download_url);
+            const raw = await fetch("https://raw.githubusercontent.com/SohailUlla/infonions/main/content/signals/first-signal.md");
             const md = await raw.text();
-
             renderSignalCard(md);
         }
 
