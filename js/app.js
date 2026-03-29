@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', init);
 
 function init() {
     setupModeSwitcher();
-    loadNews();
 }
 
 // Mode Switcher
@@ -29,32 +28,30 @@ function setupModeSwitcher() {
     });
 }
 
-// Load news data
-async function loadNews() {
+// Load pulse
+async function loadPulse() {
+    const container = document.getElementById('feedContainer');
+
+    container.innerHTML = loadingUI();
+
     try {
-        // Load both pulse and deepdive content
-        const [pulseData, deepdiveData] = await Promise.all([
-            fetch('/content/pulse.json').then(r => r.json()).catch(() => []),
-            fetch('/content/deepdive.json').then(r => r.json()).catch(() => [])
-        ]);
-        
-        // Merge data
-        newsData = pulseData.map(pulse => {
-            const deepdive = deepdiveData.find(d => d.id === pulse.id);
-            return { ...pulse, deepdive };
-        });
-        
-        // If no data, use samples
-        if (newsData.length === 0) {
-            newsData = getSampleData();
+        const res = await fetch("https://api.github.com/repos/SohailUlla/infonions/contents/content/pulse");
+        const files = await res.json();
+
+        container.innerHTML = `<div class="pulse-feed" id="pulseFeed"></div>`;
+
+        for (let file of files) {
+            if (!file.name.endsWith(".md")) continue;
+
+            const raw = await fetch(file.download_url);
+            const md = await raw.text();
+
+            renderPulse(md);
         }
-        
-        renderFeed();
-        
-    } catch (error) {
-        console.error('Error loading news:', error);
-        newsData = getSampleData();
-        renderFeed();
+
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = "⚠️ Failed to load Pulse";
     }
 }
 
@@ -71,46 +68,63 @@ function renderFeed() {
     }
 }
 
-// Render PULSE mode (short format cards)
-function renderPulseFeed() {
+// Render PULSE card from CMS (.md)
+function renderPulse(md) {
+    const data = parseFrontmatter(md);
+
+    if (!data.pulse) return;
+
     const feed = document.getElementById('pulseFeed');
-    
-    newsData.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'pulse-card';
-        card.onclick = () => viewDeepDive(item.id);
+
+    const card = document.createElement('div');
+    card.className = 'pulse-card';
+
+    const wordCount = data.pulse.split(' ').length;
+
+    const category = (data.category || '').toLowerCase();
+
+    card.innerHTML = `
+        <div class="card-category category-${category}">
+            ${data.category || ""}
+        </div>
         
-        const wordCount = item.pulse.split(' ').length;
+        <div class="pulse-content">${data.pulse}</div>
         
-        card.innerHTML = `
-            <div class="card-category category-${item.category}">
-                ${item.category}
-            </div>
-            
-            <div class="pulse-content">${item.pulse}</div>
-            
-            <div class="pulse-meta">
-                <span class="word-count">${wordCount} words</span>
-                <span>${item.time}</span>
-            </div>
-            
-            <div class="action-bar">
-                <button class="action-btn" onclick="event.stopPropagation(); signal(${item.id})">
-                    📡 Signal
-                </button>
-                <button class="action-btn" onclick="event.stopPropagation(); shareItem(${item.id})">
-                    🔗 Share
-                </button>
-                ${item.deepdive ? `
-                    <button class="action-btn" style="margin-left: auto; border-color: var(--electric-blue); color: var(--electric-blue);">
-                        🔍 Deep Dive →
-                    </button>
-                ` : ''}
-            </div>
-        `;
+        <div class="pulse-meta">
+            <span class="word-count">${wordCount} words</span>
+            <span>Just now</span>
+        </div>
         
-        feed.appendChild(card);
+        <div class="action-bar">
+            <button class="action-btn">
+                📡 Signal
+            </button>
+            <button class="action-btn">
+                🔗 Share
+            </button>
+        </div>
+    `;
+
+    feed.appendChild(card);
+}
+
+function parseFrontmatter(md) {
+    const match = md.match(/---([\s\S]*?)---/);
+    if (!match) return {};
+
+    let data = {};
+
+    match[1].split("\n").forEach(line => {
+        if (!line.includes(":")) return;
+
+        const index = line.indexOf(":");
+        const key = line.slice(0, index).trim().toLowerCase();
+        const value = line.slice(index + 1).trim();
+
+        data[key] = value;
     });
+
+    return data;
 }
 
 // Render DEEP DIVE mode (long format articles)
