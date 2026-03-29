@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', init);
 
 function init() {
     setupModeSwitcher();
+    loadPulse(); // 🔥 THIS LINE FIXES EVERYTHING
 }
 
 // Mode Switcher
@@ -59,14 +60,14 @@ async function loadPulse() {
 
 // Render feed based on mode
 function renderFeed() {
-    const container = document.getElementById('feedContainer');
-    
     if (currentMode === 'pulse') {
-        container.innerHTML = '<div class="pulse-feed" id="pulseFeed"></div>';
-        renderPulseFeed();
+        loadPulse(); // ✅ use CMS
     } else {
-        container.innerHTML = '<div class="deepdive-feed" id="deepdiveFeed"></div>';
-        renderDeepDiveFeed();
+        document.getElementById('feedContainer').innerHTML = `
+            <div style="padding:50px;text-align:center;">
+                Deep Dive coming soon 🚀
+            </div>
+        `;
     }
 }
 
@@ -292,3 +293,11 @@ window.InfonionsApp = {
     },
     getData: () => newsData
 };
+function loadingUI() {
+    return `
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading signals...</p>
+        </div>
+    `;
+}
