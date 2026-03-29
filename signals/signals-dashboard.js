@@ -442,11 +442,20 @@ async function loadSignalsFromCMS() {
 
         container.innerHTML = "";
 
+        let count = 0;
+
         for (let file of files) {
             if (!file.name.endsWith(".md")) continue;
-            const raw = await fetch("https://raw.githubusercontent.com/SohailUlla/infonions/main/content/signals/first-signal.md");
+
+            const raw = await fetch(file.download_url); // ✅ FIXED
             const md = await raw.text();
+
             renderSignalCard(md);
+            count++;
+        }
+
+        if (count === 0) {
+            container.innerHTML = "No signals yet.";
         }
 
     } catch (err) {
@@ -481,31 +490,31 @@ function parseFrontmatter(md) {
 function renderSignalCard(md) {
     const data = parseFrontmatter(md);
     console.log("Parsed Signal Data:", data);
+
+    if (!data.title) return; // skip empty
+
     const div = document.createElement("div");
     div.className = "signal-card";
 
     div.innerHTML = `
         <div class="signal-meta">
-        <span class="badge category">${data.category}</span>
-        <span class="badge type">${data.type}</span>
-    </div>
+            <span class="badge category">${data.category || ""}</span>
+            <span class="badge type">${data.type || ""}</span>
+        </div>
 
-    <h2 class="signal-title">${data.title}</h2>
+        <h2 class="signal-title">${data.title}</h2>
 
-    <p class="signal-pulse">⚡ ${data.pulse}</p>
+        <p class="signal-pulse">⚡ ${data.pulse || ""}</p>
 
-    <p class="signal-insight">🧠 ${data.insight}</p>
+        <p class="signal-insight">🧠 ${data.insight || ""}</p>
 
-    <p class="signal-why">🎯 ${data.why || ""}</p>
+        <p class="signal-why">🎯 ${data.why || ""}</p>
 
-    <div class="signal-impact">
-        📊 <span>${data.impact_short}</span> / <span>${data.impact_long}</span>
-    </div>
-`;
-document.getElementById("signals-container").innerHTML = "Loading signals...";
-    if (files.length === 0) {
-    container.innerHTML = "No signals yet.";
-}
+        <div class="signal-impact">
+            📊 <span>${data.impact_short || ""}</span> / 
+            <span>${data.impact_long || ""}</span>
+        </div>
+    `;
+
     document.getElementById("signals-container").appendChild(div);
 }
-loadSignalsFromCMS();
