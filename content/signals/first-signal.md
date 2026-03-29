@@ -11,3 +11,5 @@ impact_long: High
 ## Deep Dive
 
 India has launched multiple initiatives to boost semiconductor production...
+
+why: This impacts India's long-term tech independence and global supply chain position.
