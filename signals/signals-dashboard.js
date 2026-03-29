@@ -473,7 +473,7 @@ function parseFrontmatter(md) {
 // Render signal card
 function renderSignalCard(md) {
     const data = parseFrontmatter(md);
-
+    console.log("Parsed Signal Data:", data);
     const div = document.createElement("div");
     div.className = "signal-card";
 
