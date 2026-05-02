@@ -1,31 +1,37 @@
-.signal-card {
-    background: var(--midnight);
-    border: 1px solid var(--slate);
-    padding: 16px;
-    margin-bottom: 12px;
-    border-radius: 12px;
-    transition: 0.3s;
+/* ===============================
+   VARIABLES (IMPORTANT FIX)
+================================ */
+:root {
+    --midnight: #0f0f17;
+    --slate: #2a2a3e;
+    --electric-blue: #00d9ff;
+    --neon-purple: #b026ff;
+    --text-light: #e5e7eb;
+    --text-muted: #9ca3af;
 }
 
-.signal-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--electric-blue);
-}
-
+/* ===============================
+   SIGNAL CARD (FIXED - SINGLE VERSION)
+================================ */
 .signal-card {
     background: linear-gradient(135deg, #14141f, #1f1f2e);
-    border: 1px solid #2a2a3e;
+    border: 1px solid var(--slate);
     padding: 20px;
     margin-bottom: 16px;
     border-radius: 16px;
-    transition: 0.3s;
+    transition: all 0.3s ease;
+    color: var(--text-light);
 }
 
 .signal-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 0 25px rgba(0,217,255,0.2);
+    border-color: var(--electric-blue);
+    box-shadow: 0 0 25px rgba(0, 217, 255, 0.2);
 }
 
+/* ===============================
+   META + BADGES
+================================ */
 .signal-meta {
     margin-bottom: 10px;
 }
@@ -35,21 +41,26 @@
     padding: 4px 10px;
     border-radius: 10px;
     margin-right: 8px;
+    display: inline-block;
 }
 
 .badge.category {
-    background: rgba(0,217,255,0.1);
-    color: #00d9ff;
+    background: rgba(0, 217, 255, 0.1);
+    color: var(--electric-blue);
 }
 
 .badge.type {
-    background: rgba(176,38,255,0.1);
-    color: #b026ff;
+    background: rgba(176, 38, 255, 0.1);
+    color: var(--neon-purple);
 }
 
+/* ===============================
+   TEXT STYLING
+================================ */
 .signal-title {
     font-size: 20px;
     margin: 10px 0;
+    font-weight: 600;
 }
 
 .signal-pulse {
@@ -64,11 +75,20 @@
 .signal-impact {
     margin-top: 10px;
     font-size: 13px;
-    opacity: 0.8;
+    color: var(--text-muted);
 }
 
 .signal-why {
     color: #00ff88;
     font-size: 14px;
     margin-top: 8px;
+}
+
+/* ===============================
+   EMPTY STATE (OPTIONAL UX)
+================================ */
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
 }
