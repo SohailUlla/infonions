@@ -1,8 +1,8 @@
-// INFONIONS - FINAL VERSION (CMS + MULTI SIGNALS + ACTIVITY)
+// INFONIONS - FINAL VERSION (STABLE + CLEAN + ACTIVITY)
 
 let currentMode = 'pulse';
 
-// Initialize
+// INIT
 document.addEventListener('DOMContentLoaded', init);
 
 function init() {
@@ -10,7 +10,9 @@ function init() {
     loadPulse();
 }
 
-// Mode Switcher
+// ===============================
+// MODE SWITCH
+// ===============================
 function setupModeSwitcher() {
     const buttons = document.querySelectorAll('.mode-btn');
 
@@ -25,9 +27,12 @@ function setupModeSwitcher() {
     });
 }
 
-// 🔥 LOAD PULSE FROM GITHUB
+// ===============================
+// LOAD PULSE FROM GITHUB
+// ===============================
 async function loadPulse() {
     const container = document.getElementById('feedContainer');
+    if (!container) return;
 
     container.innerHTML = loadingUI();
 
@@ -52,12 +57,17 @@ async function loadPulse() {
     }
 }
 
-// Render Feed
+// ===============================
+// RENDER SWITCH
+// ===============================
 function renderFeed() {
     if (currentMode === 'pulse') {
         loadPulse();
     } else {
-        document.getElementById('feedContainer').innerHTML = `
+        const container = document.getElementById('feedContainer');
+        if (!container) return;
+
+        container.innerHTML = `
             <div style="padding:50px;text-align:center;">
                 Deep Dive coming soon 🚀
             </div>
@@ -65,13 +75,15 @@ function renderFeed() {
     }
 }
 
-// 🔥 RENDER CARD
+// ===============================
+// RENDER CARD
+// ===============================
 function renderPulse(md) {
     const data = parseFrontmatter(md);
-
     if (!data.pulse) return;
 
     const feed = document.getElementById('pulseFeed');
+    if (!feed) return;
 
     const card = document.createElement('div');
     card.className = 'pulse-card';
@@ -79,8 +91,9 @@ function renderPulse(md) {
     const wordCount = data.pulse.split(' ').length;
     const category = (data.category || '').toLowerCase();
 
-    // ensure ID exists
-    const id = data.id || data.pulse.slice(0, 30).replace(/\s+/g, '-').toLowerCase();
+    const id =
+        data.id ||
+        data.pulse.slice(0, 30).replace(/\s+/g, '-').toLowerCase();
 
     card.innerHTML = `
         <div class="card-category category-${category}">
@@ -102,43 +115,87 @@ function renderPulse(md) {
     feed.appendChild(card);
 }
 
-// 🔥 SIGNAL BUTTONS
+// ===============================
+// SIGNAL BUTTONS
+// ===============================
 function renderSignals(id) {
     const reactions = ["👍", "👎", "🔥", "😡", "😂", "🤯"];
 
     return reactions.map(r => `
-        <button class="action-btn" onclick="event.stopPropagation(); sendSignal('${id}', '${r}')">
+        <button class="action-btn"
+            onclick="event.stopPropagation(); sendSignal('${id}', '${r}')">
             ${r}
         </button>
     `).join('');
 }
 
-// 🔥 SIGNAL + ACTIVITY SYSTEM (IMPORTANT)
+// ===============================
+// 🔥 SIGNAL + ACTIVITY SYSTEM
+// ===============================
 function sendSignal(id, type) {
-    let signals = JSON.parse(localStorage.getItem("signals") || "{}");
-    let activity = JSON.parse(localStorage.getItem("activity") || "[]");
+    let signals = safeParse("signals", {});
+    let activity = safeParse("activity", []);
 
-    // count signals
+    // ===== COUNT SIGNAL =====
     if (!signals[id]) signals[id] = {};
     signals[id][type] = (signals[id][type] || 0) + 1;
 
-    // add activity log
+    // ===== ACTIVITY LOG =====
     activity.unshift({
         id: id,
         reaction: type,
-        time: new Date().toLocaleTimeString()
+        time: formatTime()
     });
 
-    // keep only latest 50
-    activity = activity.slice(0, 50);
+    // keep last 20 only (clean UI)
+    activity = activity.slice(0, 20);
 
     localStorage.setItem("signals", JSON.stringify(signals));
     localStorage.setItem("activity", JSON.stringify(activity));
 
-    alert(`Signal ${type} recorded 📡`);
+    // 🔥 smooth UX instead of alert
+    showToast(`Signal ${type} recorded`);
 }
 
-// 🔥 FRONTMATTER PARSER
+// ===============================
+// SAFE JSON PARSE
+// ===============================
+function safeParse(key, fallback) {
+    try {
+        return JSON.parse(localStorage.getItem(key)) || fallback;
+    } catch {
+        return fallback;
+    }
+}
+
+// ===============================
+// TIME FORMATTER
+// ===============================
+function formatTime() {
+    return new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+// ===============================
+// TOAST (NO ALERT)
+// ===============================
+function showToast(message) {
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.innerText = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 2000);
+}
+
+// ===============================
+// FRONTMATTER PARSER
+// ===============================
 function parseFrontmatter(md) {
     const match = md.match(/---([\s\S]*?)---/);
     if (!match) return {};
@@ -158,12 +215,16 @@ function parseFrontmatter(md) {
     return data;
 }
 
-// 🔥 DEEP DIVE LINK
+// ===============================
+// DEEP DIVE
+// ===============================
 function viewDeepDive(slug) {
     window.location.href = `/deep.html?slug=${slug}`;
 }
 
-// UI Loader
+// ===============================
+// LOADING UI
+// ===============================
 function loadingUI() {
     return `
         <div class="loading">
