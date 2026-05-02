@@ -16,6 +16,8 @@
 
 <script>
 if (window.netlifyIdentity) {
+
+  // Normal login redirect
   window.netlifyIdentity.on("init", user => {
     if (!user) {
       window.netlifyIdentity.on("login", () => {
@@ -24,8 +26,16 @@ if (window.netlifyIdentity) {
     }
   });
 
-  // handle invite / recovery links
-  window.netlifyIdentity.on("open", () => console.log("Identity widget opened"));
+  // 🔥 FIX: Handle invite / reset tokens
+  window.netlifyIdentity.on("init", () => {
+    if (window.location.hash.includes("invite_token") || window.location.hash.includes("recovery_token")) {
+      window.netlifyIdentity.open(); // opens password setup UI
+    }
+  });
+
+  window.netlifyIdentity.on("open", () => {
+    console.log("Identity widget opened");
+  });
 }
 </script>
 
