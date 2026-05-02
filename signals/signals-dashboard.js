@@ -1,4 +1,4 @@
-// INFONIONS SIGNALS DASHBOARD (REAL DATA - FINAL)
+// INFONIONS SIGNALS DASHBOARD (FINAL FIXED)
 
 // INIT
 document.addEventListener("DOMContentLoaded", () => {
@@ -6,22 +6,55 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ============================================
-// LOAD EVERYTHING
+// MAIN LOAD
 // ============================================
 
 function loadDashboard() {
-    loadTotalSignals();
+    const signals = JSON.parse(localStorage.getItem("signals") || "{}");
+
+    renderSignals(signals);      // 🔥 NEW (important)
+    loadTotalSignals(signals);
     loadActivityFeed();
-    loadTrending();
+    loadTrending(signals);
+}
+
+// ============================================
+// 🔥 RENDER SIGNAL CARDS (MAIN SECTION)
+// ============================================
+
+function renderSignals(signals) {
+    const container = document.getElementById("signals-container");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    if (Object.keys(signals).length === 0) {
+        container.innerHTML = `<div class="empty-state">No signals yet 🚀</div>`;
+        return;
+    }
+
+    Object.entries(signals).forEach(([id, reactions]) => {
+        const card = document.createElement("div");
+        card.className = "signal-card";
+
+        const reactionsHTML = Object.entries(reactions)
+            .map(([emoji, count]) => `<span>${emoji} ${count}</span>`)
+            .join(" &nbsp; ");
+
+        card.innerHTML = `
+            <div class="signal-title">${id}</div>
+            <div class="signal-pulse">${reactionsHTML}</div>
+        `;
+
+        container.appendChild(card);
+    });
 }
 
 // ============================================
 // TOTAL SIGNALS
 // ============================================
 
-function loadTotalSignals() {
-    const signals = JSON.parse(localStorage.getItem("signals") || "{}");
-
+function loadTotalSignals(signals) {
     let total = 0;
 
     Object.values(signals).forEach(post => {
@@ -35,7 +68,7 @@ function loadTotalSignals() {
 }
 
 // ============================================
-// ACTIVITY FEED (REAL USER ACTIONS)
+// ACTIVITY FEED (FIXED)
 // ============================================
 
 function loadActivityFeed() {
@@ -56,10 +89,10 @@ function loadActivityFeed() {
         div.className = "activity-item";
 
         div.innerHTML = `
-            <div style="font-size:20px;">${item.reaction}</div>
+            <div style="font-size:18px;">${item.reaction || "📡"}</div>
             <div>
-                <strong>${item.id}</strong><br/>
-                <small>${item.time}</small>
+                <strong>${item.id || "Unknown"}</strong><br/>
+                <small>${item.time || "just now"}</small>
             </div>
         `;
 
@@ -68,12 +101,10 @@ function loadActivityFeed() {
 }
 
 // ============================================
-// TRENDING POSTS (TOP SIGNALS)
+// TRENDING (FIXED)
 // ============================================
 
-function loadTrending() {
-    const signals = JSON.parse(localStorage.getItem("signals") || "{}");
-
+function loadTrending(signals) {
     let ranking = [];
 
     Object.keys(signals).forEach(id => {
