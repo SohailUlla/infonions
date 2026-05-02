@@ -3,6 +3,11 @@
 // INIT
 document.addEventListener("DOMContentLoaded", () => {
     loadDashboard();
+
+    // 🔥 AUTO REFRESH EVERY 2 SECONDS
+    setInterval(() => {
+        loadDashboard();
+    }, 2000);
 });
 
 // ============================================
