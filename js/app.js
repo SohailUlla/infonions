@@ -1,4 +1,4 @@
-// INFONIONS - FINAL CLEAN VERSION (CMS + Dynamic Pulse)
+// INFONIONS - FINAL VERSION (CMS + MULTI SIGNALS)
 
 let currentMode = 'pulse';
 
@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', init);
 
 function init() {
     setupModeSwitcher();
-    loadPulse(); // 🔥 main loader
+    loadPulse();
 }
 
 // Mode Switcher
@@ -25,7 +25,7 @@ function setupModeSwitcher() {
     });
 }
 
-// 🔥 MAIN PULSE LOADER (FIXED)
+// 🔥 LOAD PULSE FROM GITHUB
 async function loadPulse() {
     const container = document.getElementById('feedContainer');
 
@@ -52,7 +52,7 @@ async function loadPulse() {
     }
 }
 
-// Render feed switch
+// Render Feed
 function renderFeed() {
     if (currentMode === 'pulse') {
         loadPulse();
@@ -65,7 +65,7 @@ function renderFeed() {
     }
 }
 
-// 🔥 RENDER CARD (FIXED)
+// 🔥 RENDER CARD
 function renderPulse(md) {
     const data = parseFrontmatter(md);
 
@@ -78,6 +78,9 @@ function renderPulse(md) {
 
     const wordCount = data.pulse.split(' ').length;
     const category = (data.category || '').toLowerCase();
+
+    // ⚠️ IMPORTANT: ensure ID exists
+    const id = data.id || data.pulse.slice(0, 30).replace(/\s+/g, '-').toLowerCase();
 
     card.innerHTML = `
         <div class="card-category category-${category}">
@@ -92,25 +95,40 @@ function renderPulse(md) {
         </div>
         
         <div class="action-bar">
-            <button class="action-btn" onclick="react('agree','${data.id}')">
-                👍
-            </button>
-            <button class="action-btn" onclick="react('disagree','${data.id}')">
-                👎
-            </button>
-
-            ${data.deepdive ? `
-                <button class="action-btn" onclick="viewDeepDive('${data.deepdive}')">
-                    🔍 Deep Dive →
-                </button>
-            ` : ""}
+            ${renderSignals(id)}
         </div>
     `;
 
     feed.appendChild(card);
 }
 
-// 🔥 PARSER (SAFE)
+// 🔥 MULTI SIGNAL BUTTONS
+function renderSignals(id) {
+    const reactions = ["👍", "👎", "🔥", "😡", "😂", "🤯"];
+
+    return reactions.map(r => `
+        <button class="action-btn" onclick="event.stopPropagation(); sendSignal('${id}', '${r}')">
+            ${r}
+        </button>
+    `).join('');
+}
+
+// 🔥 SIGNAL STORAGE
+function sendSignal(id, type) {
+    let signals = JSON.parse(localStorage.getItem("signals")) || {};
+
+    if (!signals[id]) {
+        signals[id] = {};
+    }
+
+    signals[id][type] = (signals[id][type] || 0) + 1;
+
+    localStorage.setItem("signals", JSON.stringify(signals));
+
+    alert(`Signal ${type} recorded 📡`);
+}
+
+// 🔥 FRONTMATTER PARSER
 function parseFrontmatter(md) {
     const match = md.match(/---([\s\S]*?)---/);
     if (!match) return {};
@@ -128,20 +146,6 @@ function parseFrontmatter(md) {
     });
 
     return data;
-}
-
-// 🔥 TEMP SIGNAL SYSTEM (LOCAL)
-function react(type, id) {
-    let data = JSON.parse(localStorage.getItem("signals") || "{}");
-
-    if (!data[id]) data[id] = {};
-    if (!data[id][type]) data[id][type] = 0;
-
-    data[id][type]++;
-
-    localStorage.setItem("signals", JSON.stringify(data));
-
-    alert("Signal recorded 📡");
 }
 
 // 🔥 DEEP DIVE LINK
