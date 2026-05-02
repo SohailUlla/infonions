@@ -1,4 +1,4 @@
-// INFONIONS SIGNALS DASHBOARD (FINAL STABLE + LIVE)
+// INFONIONS SIGNALS DASHBOARD (FINAL + SYNCED WITH CMS)
 
 // ===============================
 // INIT
@@ -6,21 +6,84 @@
 document.addEventListener("DOMContentLoaded", () => {
     loadDashboard();
 
-    // 🔥 AUTO REFRESH EVERY 2s (no flicker)
-    setInterval(loadDashboard, 2000);
+    // 🔥 AUTO REFRESH
+    setInterval(loadDashboard, 3000);
 });
 
 // ===============================
 // MAIN LOAD
 // ===============================
-function loadDashboard() {
+async function loadDashboard() {
     const signals = safeParse("signals", {});
     const activity = safeParse("activity", []);
 
-    renderSignals(signals);
-    loadTotalSignals(signals);
+    // 🔥 GET VALID IDS FROM CMS
+    const validIds = await getValidPulseIds();
+
+    // 🔥 FILTER DELETED CONTENT
+    const filteredSignals = {};
+    Object.keys(signals).forEach(id => {
+        if (validIds.includes(id)) {
+            filteredSignals[id] = signals[id];
+        }
+    });
+
+    // OPTIONAL: CLEAN STORAGE
+    localStorage.setItem("signals", JSON.stringify(filteredSignals));
+
+    renderSignals(filteredSignals);
+    loadTotalSignals(filteredSignals);
     loadActivityFeed(activity);
-    loadTrending(signals);
+    loadTrending(filteredSignals);
+}
+
+// ===============================
+// GET VALID PULSE IDS (FROM GITHUB)
+// ===============================
+async function getValidPulseIds() {
+    try {
+        const res = await fetch("https://api.github.com/repos/SohailUlla/infonions/contents/content/pulse");
+        const files = await res.json();
+
+        let ids = [];
+
+        for (let file of files) {
+            if (!file.name.endsWith(".md")) continue;
+
+            const raw = await fetch(file.download_url);
+            const md = await raw.text();
+
+            const data = parseFrontmatter(md);
+            if (data.id) ids.push(data.id);
+        }
+
+        return ids;
+    } catch (err) {
+        console.error("Error fetching pulse IDs", err);
+        return [];
+    }
+}
+
+// ===============================
+// FRONTMATTER PARSER
+// ===============================
+function parseFrontmatter(md) {
+    const match = md.match(/---([\s\S]*?)---/);
+    if (!match) return {};
+
+    let data = {};
+
+    match[1].split("\n").forEach(line => {
+        if (!line.includes(":")) return;
+
+        const index = line.indexOf(":");
+        const key = line.slice(0, index).trim().toLowerCase();
+        const value = line.slice(index + 1).trim();
+
+        data[key] = value;
+    });
+
+    return data;
 }
 
 // ===============================
@@ -35,16 +98,16 @@ function safeParse(key, fallback) {
 }
 
 // ===============================
-// 🔥 RENDER SIGNAL CARDS
+// RENDER SIGNAL CARDS
 // ===============================
 function renderSignals(signals) {
     const container = document.getElementById("signals-container");
     if (!container) return;
 
-    // avoid unnecessary re-render flicker
-    if (container.dataset.rendered === JSON.stringify(signals)) return;
-    container.dataset.rendered = JSON.stringify(signals);
+    const currentData = JSON.stringify(signals);
+    if (container.dataset.rendered === currentData) return;
 
+    container.dataset.rendered = currentData;
     container.innerHTML = "";
 
     if (Object.keys(signals).length === 0) {
@@ -70,7 +133,7 @@ function renderSignals(signals) {
 }
 
 // ===============================
-// TOTAL SIGNALS (ANIMATED)
+// TOTAL SIGNALS
 // ===============================
 function loadTotalSignals(signals) {
     let total = 0;
@@ -107,7 +170,7 @@ function animateNumber(el, target) {
 }
 
 // ===============================
-// ACTIVITY FEED (SMOOTH)
+// ACTIVITY FEED
 // ===============================
 function loadActivityFeed(activity) {
     const container = document.getElementById("activityFeed");
@@ -135,7 +198,6 @@ function loadActivityFeed(activity) {
 
         container.appendChild(div);
 
-        // fade-in animation
         setTimeout(() => {
             div.style.opacity = "1";
         }, 50);
