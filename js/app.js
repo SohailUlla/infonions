@@ -1,4 +1,4 @@
-// INFONIONS - FINAL VERSION (CMS + MULTI SIGNALS)
+// INFONIONS - FINAL VERSION (CMS + MULTI SIGNALS + ACTIVITY)
 
 let currentMode = 'pulse';
 
@@ -79,7 +79,7 @@ function renderPulse(md) {
     const wordCount = data.pulse.split(' ').length;
     const category = (data.category || '').toLowerCase();
 
-    // ⚠️ IMPORTANT: ensure ID exists
+    // ensure ID exists
     const id = data.id || data.pulse.slice(0, 30).replace(/\s+/g, '-').toLowerCase();
 
     card.innerHTML = `
@@ -102,7 +102,7 @@ function renderPulse(md) {
     feed.appendChild(card);
 }
 
-// 🔥 MULTI SIGNAL BUTTONS
+// 🔥 SIGNAL BUTTONS
 function renderSignals(id) {
     const reactions = ["👍", "👎", "🔥", "😡", "😂", "🤯"];
 
@@ -113,17 +113,27 @@ function renderSignals(id) {
     `).join('');
 }
 
-// 🔥 SIGNAL STORAGE
+// 🔥 SIGNAL + ACTIVITY SYSTEM (IMPORTANT)
 function sendSignal(id, type) {
-    let signals = JSON.parse(localStorage.getItem("signals")) || {};
+    let signals = JSON.parse(localStorage.getItem("signals") || "{}");
+    let activity = JSON.parse(localStorage.getItem("activity") || "[]");
 
-    if (!signals[id]) {
-        signals[id] = {};
-    }
-
+    // count signals
+    if (!signals[id]) signals[id] = {};
     signals[id][type] = (signals[id][type] || 0) + 1;
 
+    // add activity log
+    activity.unshift({
+        id: id,
+        reaction: type,
+        time: new Date().toLocaleTimeString()
+    });
+
+    // keep only latest 50
+    activity = activity.slice(0, 50);
+
     localStorage.setItem("signals", JSON.stringify(signals));
+    localStorage.setItem("activity", JSON.stringify(activity));
 
     alert(`Signal ${type} recorded 📡`);
 }
