@@ -202,22 +202,39 @@ function showToast(message) {
 // ===============================
 function parseFrontmatter(md) {
     const match = md.match(/---([\s\S]*?)---/);
+
     if (!match) return {};
 
-    let data = {};
+    const yaml = match[1];
+    const data = {};
 
-    match[1]
-        .split("\n")
-        .filter(line => line.includes(":"))
-        .forEach(line => {
-            const [key, ...rest] = line.split(":");
-            const value = rest.join(":").trim();
+    let currentKey = null;
 
-            data[key.trim().toLowerCase()] = value
-                .replace(/^["']|["']$/g, "")
-                .replace(/\r/g, "")
-                .replace(/\n/g, " ");
-        });
+    yaml.split("\n").forEach(line => {
+
+        // new key:value line
+        if (/^\w+:/i.test(line)) {
+
+            const index = line.indexOf(":");
+
+            currentKey = line.slice(0, index)
+                .trim()
+                .toLowerCase();
+
+            data[currentKey] = line
+                .slice(index + 1)
+                .trim();
+
+        }
+
+        // multiline continuation
+        else if (currentKey && line.trim()) {
+
+            data[currentKey] += " " + line.trim();
+
+        }
+
+    });
 
     return data;
 }
