@@ -137,28 +137,46 @@ function renderSignals(id) {
 // 🔥 SIGNAL + ACTIVITY SYSTEM
 // ===============================
 function sendSignal(id, type) {
-    let signals = safeParse("signals", {});
-    let activity = safeParse("activity", []);
 
-    // ===== COUNT SIGNAL =====
-    if (!signals[id]) signals[id] = {};
+    // unique user vote key
+    const voteKey = `voted_${id}`;
+
+    // check already voted
+    if (localStorage.getItem(voteKey)) {
+        alert("You already reacted to this signal 📡");
+        return;
+    }
+
+    let signals = JSON.parse(localStorage.getItem("signals") || "{}");
+    let activity = JSON.parse(localStorage.getItem("activity") || "[]");
+
+    // create post if not exists
+    if (!signals[id]) {
+        signals[id] = {};
+    }
+
+    // count reaction
     signals[id][type] = (signals[id][type] || 0) + 1;
 
-    // ===== ACTIVITY LOG =====
+    // save activity
     activity.unshift({
         id: id,
         reaction: type,
-        time: formatTime()
+        time: new Date().toLocaleTimeString()
     });
 
-    // keep last 20 only (clean UI)
-    activity = activity.slice(0, 20);
+    // keep latest 50
+    activity = activity.slice(0, 50);
 
+    // save data
     localStorage.setItem("signals", JSON.stringify(signals));
     localStorage.setItem("activity", JSON.stringify(activity));
 
-    // 🔥 smooth UX instead of alert
-    showToast(`Signal ${type} recorded`);
+    // 🔥 IMPORTANT
+    // mark user voted
+    localStorage.setItem(voteKey, type);
+
+    alert(`Signal ${type} recorded 📡`);
 }
 
 // ===============================
