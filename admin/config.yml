@@ -25,6 +25,18 @@ collections:
           - {label: "Economy 💰", value: "economy"}
           - {label: "Tech 💻", value: "tech"}
           - {label: "Society 🌍", value: "society"}
+          - {label: "World Affairs 🌐", value: "world-affairs"}
+          - {label: "Defense ⚔️", value: "defense"}
+          - {label: "Health 🏥", value: "health"}
+          - {label: "Environment 🌱", value: "environment"}
+          - {label: "Business 📈", value: "business"}
+          - {label: "Science 🔬", value: "science"}
+          - {label: "Education 🎓", value: "education"}
+          - {label: "Law ⚖️", value: "law"}
+          - {label: "Elections 🗳️", value: "elections"}
+          - {label: "Infrastructure 🏗️", value: "infrastructure"}
+          - {label: "Energy ⚡", value: "energy"}
+                 
       
       - label: "Pulse Content"
         name: "pulse"
