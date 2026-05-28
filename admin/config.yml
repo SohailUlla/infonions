@@ -17,6 +17,7 @@ collections:
     editor:
       preview: true
     fields:
+      - {label: "ID", name: "id", widget: "string"}
       - label: "Category"
         name: "category"
         widget: "select"
