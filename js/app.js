@@ -89,8 +89,8 @@ function renderPulse(md) {
     card.className = 'pulse-card';
 
     const wordCount = (data.pulse || "")
-    .trim()
     .replace(/\s+/g, " ")
+    .trim()
     .split(" ")
     .filter(Boolean).length;
     const category = (data.category || '').toLowerCase();
