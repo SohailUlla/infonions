@@ -202,15 +202,18 @@ function parseFrontmatter(md) {
 
     let data = {};
 
-    match[1].split("\n").forEach(line => {
-        if (!line.includes(":")) return;
+    match[1]
+        .split("\n")
+        .filter(line => line.includes(":"))
+        .forEach(line => {
+            const [key, ...rest] = line.split(":");
+            const value = rest.join(":").trim();
 
-        const index = line.indexOf(":");
-        const key = line.slice(0, index).trim().toLowerCase();
-        const value = line.slice(index + 1).trim();
-
-        data[key] = value;
-    });
+            data[key.trim().toLowerCase()] = value
+                .replace(/^["']|["']$/g, "")
+                .replace(/\r/g, "")
+                .replace(/\n/g, " ");
+        });
 
     return data;
 }
