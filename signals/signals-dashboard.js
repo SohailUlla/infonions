@@ -14,52 +14,98 @@ document.addEventListener("DOMContentLoaded", () => {
 // MAIN LOAD
 // ===============================
 async function loadDashboard() {
-    const signals = safeParse("signals", {});
-    const activity = safeParse("activity", []);
+
+    let signals = safeParse("signals", {});
+    let activity = safeParse("activity", []);
 
     // 🔥 GET VALID IDS FROM CMS
     const validIds = await getValidPulseIds();
 
-    // 🔥 FILTER DELETED CONTENT
+    // ===============================
+    // FILTER SIGNALS
+    // ===============================
     const filteredSignals = {};
+
     Object.keys(signals).forEach(id => {
+
         if (validIds.includes(id)) {
             filteredSignals[id] = signals[id];
         }
+
     });
 
-    // OPTIONAL: CLEAN STORAGE
-    localStorage.setItem("signals", JSON.stringify(filteredSignals));
+    // ===============================
+    // FILTER ACTIVITY
+    // ===============================
+    const filteredActivity = activity.filter(item =>
+        validIds.includes(item.id)
+    );
 
+    // ===============================
+    // SAVE CLEANED STORAGE
+    // ===============================
+    localStorage.setItem(
+        "signals",
+        JSON.stringify(filteredSignals)
+    );
+
+    localStorage.setItem(
+        "activity",
+        JSON.stringify(filteredActivity)
+    );
+
+    // ===============================
+    // RENDER
+    // ===============================
     renderSignals(filteredSignals);
+
     loadTotalSignals(filteredSignals);
-    loadActivityFeed(activity);
+
+    loadActivityFeed(filteredActivity);
+
     loadTrending(filteredSignals);
 }
 
-// ===============================
+// ============================================
 // GET VALID PULSE IDS (FROM GITHUB)
-// ===============================
+// ============================================
+
 async function getValidPulseIds() {
+
     try {
-        const res = await fetch("https://api.github.com/repos/SohailUlla/infonions/contents/content/pulse");
+
+        const res = await fetch(
+            "https://api.github.com/repos/SohailUlla/infonions/contents/content/pulse"
+        );
+
         const files = await res.json();
 
         let ids = [];
 
         for (let file of files) {
+
             if (!file.name.endsWith(".md")) continue;
 
             const raw = await fetch(file.download_url);
+
             const md = await raw.text();
 
-            const data = parseFrontmatter(md);
-            if (data.id) ids.push(data.id);
+            // 🔥 DIRECT REGEX
+            const match = md.match(/^id:\s*(.*)$/m);
+
+            if (match && match[1]) {
+
+                ids.push(match[1].trim());
+
+            }
         }
 
         return ids;
+
     } catch (err) {
+
         console.error("Error fetching pulse IDs", err);
+
         return [];
     }
 }
