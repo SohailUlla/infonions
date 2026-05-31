@@ -8,6 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
         .addEventListener("input", searchArticles);
 });
 
+// ============================================
+// LOAD ARCHIVE
+// ============================================
 async function loadArchive() {
 
     const container =
@@ -19,12 +22,18 @@ async function loadArchive() {
 
         allArticles = [];
 
-        // PULSE
+        // =========================
+        // LOAD PULSE
+        // =========================
         const pulseRes = await fetch(
             "https://api.github.com/repos/SohailUlla/infonions/contents/content/pulse"
         );
 
         const pulseFiles = await pulseRes.json();
+
+        if (!Array.isArray(pulseFiles)) {
+            throw new Error("Pulse folder not found");
+        }
 
         for (const file of pulseFiles) {
 
@@ -40,12 +49,18 @@ async function loadArchive() {
             allArticles.push(data);
         }
 
-        // DEEP DIVE
+        // =========================
+        // LOAD DEEP DIVE
+        // =========================
         const deepRes = await fetch(
             "https://api.github.com/repos/SohailUlla/infonions/contents/content/deepdive"
         );
 
         const deepFiles = await deepRes.json();
+
+        if (!Array.isArray(deepFiles)) {
+            throw new Error("Deep Dive folder not found");
+        }
 
         for (const file of deepFiles) {
 
@@ -63,41 +78,60 @@ async function loadArchive() {
 
         renderArticles(allArticles);
 
-    } catch(err) {
+    } catch (err) {
 
         console.error(err);
 
-        container.innerHTML =
-            "Failed to load archive";
+        container.innerHTML = `
+            <div style="padding:30px;color:#ff6b6b;">
+                Failed to load archive
+            </div>
+        `;
     }
 }
 
-function renderArticles(data){
+// ============================================
+// RENDER ARTICLES
+// ============================================
+function renderArticles(data) {
 
     const container =
         document.getElementById("archiveList");
 
     container.innerHTML = "";
 
-    data.reverse().forEach(item => {
+    if (data.length === 0) {
+
+        container.innerHTML = `
+            <div class="archive-item">
+                No articles found 🔍
+            </div>
+        `;
+
+        return;
+    }
+
+    [...data].reverse().forEach(item => {
 
         const title =
             item.pulse ||
             item.title ||
             item.headline ||
+            item.summary ||
             "Untitled";
 
         container.innerHTML += `
             <div class="archive-item">
 
                 <div class="archive-category">
-                    ${item.category || ""}
+                    ${item.category || "general"}
                 </div>
 
                 <div style="
                     color:#00ff88;
                     margin-bottom:10px;
                     font-size:13px;
+                    font-weight:600;
                 ">
                     ${item.contentType}
                 </div>
@@ -110,7 +144,11 @@ function renderArticles(data){
         `;
     });
 }
-function searchArticles(){
+
+// ============================================
+// SEARCH
+// ============================================
+function searchArticles() {
 
     const q =
         document
@@ -121,12 +159,19 @@ function searchArticles(){
     const filtered = allArticles.filter(item => {
 
         return (
-    (item.pulse || "") +
-    " " +
-    (item.title || "") +
-    " " +
-    (item.category || "")
-)
+            (
+                (item.pulse || "") +
+                " " +
+                (item.title || "") +
+                " " +
+                (item.summary || "") +
+                " " +
+                (item.content || "") +
+                " " +
+                (item.category || "") +
+                " " +
+                (item.contentType || "")
+            )
             .toLowerCase()
             .includes(q)
         );
@@ -135,32 +180,34 @@ function searchArticles(){
     renderArticles(filtered);
 }
 
-function parseFrontmatter(md){
+// ============================================
+// FRONTMATTER PARSER
+// ============================================
+function parseFrontmatter(md) {
 
     const match =
         md.match(/---([\s\S]*?)---/);
 
-    if(!match) return {};
+    if (!match) return {};
 
     let data = {};
 
     match[1].split("\n").forEach(line => {
 
-        if(!line.includes(":")) return;
+        if (!line.includes(":")) return;
 
         const i = line.indexOf(":");
 
         const key =
-            line.slice(0,i)
+            line.slice(0, i)
             .trim()
             .toLowerCase();
 
         const value =
-            line.slice(i+1)
+            line.slice(i + 1)
             .trim();
 
         data[key] = value;
-
     });
 
     return data;
