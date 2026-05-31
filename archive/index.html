@@ -1,11 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Infonions Archive</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Archive | Infonions</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    background:#050510;
+    color:white;
+    font-family:'Space Grotesk',sans-serif;
+    padding:40px;
+}
+
+h1{
+    margin-bottom:30px;
+}
+
+.search-box{
+    width:100%;
+    max-width:600px;
+    padding:15px;
+    border-radius:12px;
+    border:none;
+    background:#111827;
+    color:white;
+    font-size:16px;
+}
+
+.archive-list{
+    margin-top:30px;
+}
+
+.archive-item{
+    background:#111827;
+    border:1px solid #1f2937;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:15px;
+}
+
+.archive-category{
+    color:#00d9ff;
+    font-size:12px;
+    margin-bottom:8px;
+}
+
+.archive-title{
+    font-size:18px;
+    line-height:1.6;
+}
+
+</style>
 </head>
+
 <body>
 
-<h1>Infonions Archive</h1>
+<h1>📚 Infonions Archive</h1>
+
+<input
+    type="text"
+    id="searchInput"
+    class="search-box"
+    placeholder="Search Pulse & Deep Dive..."
+>
+
+<div id="archiveList" class="archive-list"></div>
+
+<script src="archive.js"></script>
 
 </body>
 </html>
