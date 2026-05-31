@@ -44,26 +44,23 @@ async function loadDashboard() {
     // ===============================
     // SAVE CLEANED STORAGE
     // ===============================
-    localStorage.setItem(
-        "signals",
-        JSON.stringify(filteredSignals)
-    );
+    // localStorage.setItem(
+       // "signals",
+       // JSON.stringify(filteredSignals)
+   // );
 
-    localStorage.setItem(
-        "activity",
-        JSON.stringify(filteredActivity)
-    );
+   // localStorage.setItem(
+     //   "activity",
+       // JSON.stringify(filteredActivity)
+    // );
 
     // ===============================
     // RENDER
     // ===============================
-    renderSignals(filteredSignals);
-
-    loadTotalSignals(filteredSignals);
-
-    loadActivityFeed(filteredActivity);
-
-    loadTrending(filteredSignals);
+renderSignals(signals);
+loadTotalSignals(signals);
+loadActivityFeed(activity);
+loadTrending(signals);
 }
 
 // ============================================
