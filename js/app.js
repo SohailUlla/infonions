@@ -55,6 +55,43 @@ async function loadPulse() {
         console.error(err);
         container.innerHTML = "⚠️ Failed to load Pulse";
     }
+// ===============================
+// LOAD DEEP DIVE FROM GITHUB
+// ===============================
+async function loadDeepDive() {
+
+    const container = document.getElementById("feedContainer");
+    if (!container) return;
+
+    container.innerHTML = loadingUI();
+
+    try {
+
+        const res = await fetch(
+            "https://api.github.com/repos/SohailUlla/infonions/contents/content/deepdive"
+        );
+
+        const files = await res.json();
+
+        container.innerHTML = `<div class="pulse-feed" id="pulseFeed"></div>`;
+
+        for (const file of files) {
+
+            if (!file.name.endsWith(".md")) continue;
+
+            const raw = await fetch(file.download_url);
+            const md = await raw.text();
+
+            renderDeepDive(md);
+        }
+
+    } catch (err) {
+
+        console.error(err);
+        container.innerHTML = "⚠️ Failed to load Deep Dive";
+
+    }
+}
 }
 
 // ===============================
