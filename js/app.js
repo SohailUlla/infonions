@@ -148,6 +148,52 @@ function renderPulse(md) {
 
     feed.appendChild(card);
 }
+// ===============================
+// RENDER DEEP DIVE
+// ===============================
+function renderDeepDive(md) {
+
+    const data = parseFrontmatter(md);
+
+    const feed = document.getElementById("pulseFeed");
+    if (!feed) return;
+
+    const card = document.createElement("div");
+    card.className = "pulse-card";
+
+    const title = data.title || "Untitled";
+    const excerpt = data.excerpt || "";
+    const category = (data.category || "").toLowerCase();
+
+    const id = title.replace(/\s+/g, "-").toLowerCase();
+
+    const date = data.date
+        ? new Date(data.date).toLocaleDateString()
+        : "";
+
+    card.innerHTML = `
+        <div class="card-category category-${category}">
+            ${data.category || ""}
+        </div>
+
+        <h2>${title}</h2>
+
+        <div class="pulse-content">
+            ${excerpt}
+        </div>
+
+        <div class="pulse-meta">
+            <span>${data.author || "Infonions"}</span>
+            <span>${date}</span>
+        </div>
+
+        <div class="action-bar">
+            ${renderSignals(id)}
+        </div>
+    `;
+
+    feed.appendChild(card);
+}
 
 // ===============================
 // SIGNAL BUTTONS
