@@ -61,17 +61,10 @@ async function loadPulse() {
 // RENDER SWITCH
 // ===============================
 function renderFeed() {
-    if (currentMode === 'pulse') {
+    if (currentMode === "pulse") {
         loadPulse();
     } else {
-        const container = document.getElementById('feedContainer');
-        if (!container) return;
-
-        container.innerHTML = `
-            <div style="padding:50px;text-align:center;">
-                Deep Dive coming soon 🚀
-            </div>
-        `;
+        loadDeepDive();
     }
 }
 
