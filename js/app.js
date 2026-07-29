@@ -54,7 +54,8 @@ async function loadPulse() {
     } catch (err) {
         console.error(err);
         container.innerHTML = "⚠️ Failed to load Pulse";
-    }
+}
+}
 // ===============================
 // LOAD DEEP DIVE FROM GITHUB
 // ===============================
@@ -92,8 +93,6 @@ async function loadDeepDive() {
 
     }
 }
-}
-
 // ===============================
 // RENDER SWITCH
 // ===============================
