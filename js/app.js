@@ -116,6 +116,11 @@ function renderPulse(md) {
 
     const card = document.createElement('div');
     card.className = 'pulse-card';
+    card.style.cursor = "pointer";
+
+card.onclick = () => {
+    alert("Full Deep Dive page is not built yet.");
+};
 
     const wordCount = (data.pulse || "")
     .replace(/\s+/g, " ")
