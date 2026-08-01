@@ -1,19 +1,14 @@
-// ===============================
+// ===========================
 // INFONIONS ARTICLE READER
-// ===============================
+// ===========================
 
 const params = new URLSearchParams(window.location.search);
 const file = params.get("file");
 
 if (!file) {
-
-    document.getElementById("content").innerHTML =
-        "<h2>Article not found.</h2>";
-
+    document.getElementById("content").innerHTML = "<h2>Article not found.</h2>";
 } else {
-
     loadArticle(file);
-
 }
 
 async function loadArticle(file) {
@@ -28,32 +23,57 @@ async function loadArticle(file) {
         if (!res.ok)
             throw new Error("Article not found");
 
-const markdown = await res.text();
+        const md = await res.text();
 
-const title = getFrontmatter(markdown, "title");
-const author = getFrontmatter(markdown, "author");
-const date = getFrontmatter(markdown, "date");
-const category = getFrontmatter(markdown, "category");
+        // -----------------------
+        // Split frontmatter
+        // -----------------------
 
-const body = removeFrontmatter(markdown);
+        const parts = md.split("---");
 
-document.title = title + " | Infonions";
+        const yamlText = parts[1];
+        const markdown = parts.slice(2).join("---");
 
-document.getElementById("title").textContent = title;
-document.getElementById("author").textContent = author;
-document.getElementById("date").textContent =
-    new Date(date).toLocaleDateString();
+        const data = jsyaml.load(yamlText);
 
-document.getElementById("category").textContent =
-    category.toUpperCase();
+        // -----------------------
+        // Fill page
+        // -----------------------
 
-// ⭐ This is the important line
-document.getElementById("content").innerHTML =
-    marked.parse(body);
+        document.title = data.title + " | Infonions";
+
+        document.getElementById("category").textContent =
+            data.category || "";
+
+        document.getElementById("title").textContent =
+            data.title || "";
+
+        document.getElementById("excerpt").textContent =
+            data.excerpt || "";
+
+        document.getElementById("author").textContent =
+            data.author || "";
+
+        document.getElementById("date").textContent =
+            new Date(data.date).toLocaleDateString();
+
+        // Reading time
+
+        const words = markdown
+            .replace(/\n/g, " ")
+            .split(/\s+/).length;
+
+        document.getElementById("reading").textContent =
+            Math.ceil(words / 200) + " min read";
+
+        // Markdown → HTML
+
+        document.getElementById("content").innerHTML =
+            marked.parse(markdown);
 
     }
 
-    catch (err) {
+    catch(err){
 
         console.error(err);
 
@@ -61,76 +81,5 @@ document.getElementById("content").innerHTML =
             "<h2>Unable to load article.</h2>";
 
     }
-
-}
-// ===============================
-// REMOVE FRONTMATTER
-// ===============================
-function removeFrontmatter(md) {
-
-    return md.replace(/^---[\s\S]*?---/, "").trim();
-
-}
-
-// ===============================
-// GET SINGLE FRONTMATTER VALUE
-// ===============================
-function getFrontmatter(md, key) {
-
-    const match = md.match(/^---([\s\S]*?)---/);
-
-    if (!match) return "";
-
-    const lines = match[1].split("\n");
-
-    for (const line of lines) {
-
-        if (line.startsWith(key + ":")) {
-
-            return line.replace(key + ":", "").trim();
-
-        }
-
-    }
-
-    return "";
-
-}
-// ===============================
-// SIMPLE MARKDOWN TO HTML
-// ===============================
-function markdownToHTML(md) {
-
-    return md
-
-        // Headings
-        .replace(/^### (.*)$/gm, "<h3>$1</h3>")
-        .replace(/^## (.*)$/gm, "<h2>$1</h2>")
-        .replace(/^# (.*)$/gm, "<h1>$1</h1>")
-
-        // Bold
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-
-        // Italic
-        .replace(/\*(.*?)\*/g, "<em>$1</em>")
-
-        // Paragraphs
-        .split("\n\n")
-        .map(block => {
-
-            block = block.trim();
-
-            if (
-                block.startsWith("<h1") ||
-                block.startsWith("<h2") ||
-                block.startsWith("<h3")
-            ) {
-                return block;
-            }
-
-            return `<p>${block.replace(/\n/g, "<br>")}</p>`;
-
-        })
-        .join("");
 
 }
