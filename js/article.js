@@ -30,17 +30,26 @@ async function loadArticle(file) {
 
 const markdown = await res.text();
 
-document.getElementById("title").innerText =
-    getFrontmatter(markdown, "title");
+const title = getFrontmatter(markdown, "title");
+const author = getFrontmatter(markdown, "author");
+const date = getFrontmatter(markdown, "date");
+const category = getFrontmatter(markdown, "category");
 
-document.getElementById("author").innerText =
-    getFrontmatter(markdown, "author");
+const body = removeFrontmatter(markdown);
 
-document.getElementById("date").innerText =
-    getFrontmatter(markdown, "date");
+document.title = title + " | Infonions";
 
+document.getElementById("title").textContent = title;
+document.getElementById("author").textContent = author;
+document.getElementById("date").textContent =
+    new Date(date).toLocaleDateString();
+
+document.getElementById("category").textContent =
+    category.toUpperCase();
+
+// ⭐ This is the important line
 document.getElementById("content").innerHTML =
-    markdownToHTML(removeFrontmatter(markdown));
+    marked.parse(body);
 
     }
 
