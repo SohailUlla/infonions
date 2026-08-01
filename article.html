@@ -4,48 +4,255 @@
 <head>
 
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Loading...</title>
+<title>Infonions</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
 body{
 
-margin:0;
-
 background:#050505;
+color:#F5F7FA;
+font-family:'Manrope',sans-serif;
+
+}
+
+/* Grid Background */
+
+body::before{
+
+content:"";
+position:fixed;
+inset:0;
+
+background-image:
+linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+
+background-size:60px 60px;
+
+z-index:-1;
+
+}
+
+/* Container */
+
+.container{
+
+max-width:860px;
+margin:auto;
+
+padding:80px 24px;
+
+}
+
+/* Back */
+
+.back{
+
+display:inline-block;
+
+margin-bottom:40px;
+
+color:#8A8F98;
+
+text-decoration:none;
+
+font-size:15px;
+
+}
+
+.back:hover{
 
 color:white;
 
-font-family:Inter,sans-serif;
+}
+
+/* Category */
+
+.category{
+
+display:inline-block;
+
+padding:8px 16px;
+
+border-radius:999px;
+
+background:#18181d;
+
+color:#6EA8FE;
+
+font-size:13px;
+
+font-weight:700;
+
+text-transform:uppercase;
+
+letter-spacing:1px;
+
+margin-bottom:24px;
 
 }
 
-.article{
+/* Title */
 
-max-width:850px;
+.title{
 
-margin:100px auto;
+font-size:54px;
 
-padding:20px;
+line-height:1.05;
+
+font-weight:800;
+
+margin-bottom:20px;
 
 }
 
-.loading{
+/* Excerpt */
 
-text-align:center;
+.excerpt{
 
-margin-top:150px;
+font-size:23px;
 
-font-size:22px;
+line-height:1.7;
+
+color:#B6BCC8;
+
+margin-bottom:36px;
+
+}
+
+/* Meta */
+
+.meta{
+
+display:flex;
+
+gap:20px;
+
+flex-wrap:wrap;
+
+font-size:15px;
+
+color:#8D95A4;
+
+margin-bottom:50px;
+
+}
+
+/* Hero */
+
+.hero{
+
+width:100%;
+
+height:420px;
+
+border-radius:22px;
+
+background:#101115;
+
+margin-bottom:60px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+color:#555;
+
+font-size:18px;
+
+}
+
+/* Article */
+
+.content{
+
+font-size:21px;
+
+line-height:2;
+
+color:#E5E7EB;
+
+}
+
+.content p{
+
+margin-bottom:34px;
+
+}
+
+.content h2{
+
+font-size:36px;
+
+margin-top:70px;
+
+margin-bottom:22px;
+
+}
+
+.content ul{
+
+padding-left:30px;
+
+margin:30px 0;
+
+}
+
+.content li{
+
+margin-bottom:14px;
+
+}
+
+/* Mobile */
+
+@media(max-width:768px){
+
+.container{
+
+padding:30px 20px;
+
+}
+
+.title{
+
+font-size:38px;
+
+}
+
+.excerpt{
+
+font-size:20px;
+
+}
+
+.hero{
+
+height:220px;
+
+}
+
+.content{
+
+font-size:19px;
+
+}
 
 }
 
@@ -55,57 +262,51 @@ font-size:22px;
 
 <body>
 
-<div id="app" class="loading">
+<div class="container">
+
+<a class="back" href="/">← Back to Home</a>
+
+<div class="category" id="category">
+Loading...
+</div>
+
+<h1 class="title" id="title">
+Loading article...
+</h1>
+
+<p class="excerpt" id="excerpt">
+Preparing article...
+</p>
+
+<div class="meta">
+
+<span id="author">
+Author
+</span>
+
+<span id="date">
+Date
+</span>
+
+<span id="reading">
+Reading time
+</span>
+
+</div>
+
+<div class="hero">
+Hero Image (coming soon)
+</div>
+
+<div class="content" id="content">
 
 Loading article...
 
 </div>
 
-<script>
-const params = new URLSearchParams(window.location.search);
-const file = params.get("file");
+</div>
 
-async function loadArticle() {
-
-    if (!file) {
-        document.getElementById("app").textContent = "Article not found.";
-        return;
-    }
-
-    const url = "https://raw.githubusercontent.com/SohailUlla/infonions/main/content/deepdive/" + file;
-
-    try {
-
-        const res = await fetch(url);
-
-        if (!res.ok) {
-            throw new Error("File not found");
-        }
-
-        const md = await res.text();
-
-        document.getElementById("app").innerHTML =
-        `
-        <div class="article">
-            <pre style="white-space:pre-wrap;font-family:Inter,sans-serif;">
-${md}
-            </pre>
-        </div>
-        `;
-
-    } catch (err) {
-
-        document.getElementById("app").textContent =
-            "Failed to load article.";
-
-        console.error(err);
-
-    }
-
-}
-
-loadArticle();
-</script>
+<script src="/js/article.js"></script>
 
 </body>
 
