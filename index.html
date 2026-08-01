@@ -102,7 +102,11 @@ body {
         .logo-icon {
             width: 40px;
             height: 40px;
-            background: var(--gradient-primary);
+            background: linear-gradient(
+135deg,
+#4F7CFF,
+#7A5CFA
+);
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -110,23 +114,22 @@ body {
             font-size: 24px;
         }
         
-        .logo-text {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -1px;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+.logo-text {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.06em;
+    color: #FFFFFF;
+}
         
-        .tagline {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 10px;
-            color: var(--shadow);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-top: 4px;
-        }
+.tagline {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #8A92A6;
+    letter-spacing: 0;
+    margin-top: 3px;
+}
         
         nav {
             display: flex;
@@ -208,15 +211,23 @@ body {
             text-align: center;
         }
         
-        .hero h1 {
-            font-size: 64px;
-            font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 20px;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+.hero h1 {
+    font-family: 'Manrope', sans-serif;
+    font-size: clamp(48px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    margin-bottom: 24px;
+
+    background: linear-gradient(
+        180deg,
+        #FFFFFF 0%,
+        #D8E2FF 100%
+    );
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
         
         .hero-subtitle {
             font-size: 24px;
