@@ -83,7 +83,7 @@ async function loadDeepDive() {
             const raw = await fetch(file.download_url);
             const md = await raw.text();
 
-            renderDeepDive(md);
+            renderDeepDive(md, file.name);
         }
 
     } catch (err) {
@@ -155,15 +155,22 @@ card.onclick = () => {
 // ===============================
 // RENDER DEEP DIVE
 // ===============================
-function renderDeepDive(md) {
+
+function renderDeepDive(md, fileName) {
 
     const data = parseFrontmatter(md);
 
     const feed = document.getElementById("pulseFeed");
     if (!feed) return;
 
-    const card = document.createElement("div");
-    card.className = "pulse-card";
+const card = document.createElement("div");
+card.className = "pulse-card";
+
+card.style.cursor = "pointer";
+
+card.onclick = () => {
+    window.location.href = `/article.html?file=${encodeURIComponent(fileName)}`;
+};
 
     const title = data.title || "Untitled";
     const excerpt = data.excerpt || "";
