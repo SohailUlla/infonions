@@ -62,53 +62,49 @@ Loading article...
 </div>
 
 <script>
-
-
 const params = new URLSearchParams(window.location.search);
-
 const file = params.get("file");
 
-loadArticle();
+async function loadArticle() {
 
-async function loadArticle(){
-
-    if(!file){
-
-        document.getElementById("app").innerHTML="Article not found.";
-
+    if (!file) {
+        document.getElementById("app").textContent = "Article not found.";
         return;
-
     }
 
-    const url =
-`https://raw.githubusercontent.com/SohailUlla/infonions/main/content/deepdive/${file}`;
+    const url = "https://raw.githubusercontent.com/SohailUlla/infonions/main/content/deepdive/" + file;
 
-    try{
+    try {
 
         const res = await fetch(url);
 
+        if (!res.ok) {
+            throw new Error("File not found");
+        }
+
         const md = await res.text();
 
-        document.getElementById("app").innerHTML=`
-            <div class="article">
-
-                <pre style="white-space:pre-wrap;font-family:Inter;">
+        document.getElementById("app").innerHTML =
+        `
+        <div class="article">
+            <pre style="white-space:pre-wrap;font-family:Inter,sans-serif;">
 ${md}
-                </pre>
-
-            </div>
+            </pre>
+        </div>
         `;
 
-    }
+    } catch (err) {
 
-    catch(err){
+        document.getElementById("app").textContent =
+            "Failed to load article.";
 
-        document.getElementById("app").innerHTML="Failed to load article.";
+        console.error(err);
 
     }
 
 }
 
+loadArticle();
 </script>
 
 </body>
