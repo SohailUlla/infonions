@@ -35,6 +35,8 @@ async function loadArticle(file) {
         const markdown = parts.slice(2).join("---");
 
         const data = jsyaml.load(yamlText);
+        console.log(data);
+console.log(markdown);
 
         // -----------------------
         // Fill page
