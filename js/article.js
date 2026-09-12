@@ -3,22 +3,168 @@
 // Article loading + Markdown rendering + SEO
 // ==========================================
 
-const params = new URLSearchParams(window.location.search);
-const file = params.get("file");
+
+// ==========================================
+// URL PARAMETERS
+// ==========================================
+
+const params = new URLSearchParams(
+    window.location.search
+);
+
+const fileParam = params.get("file");
+const slugParam = params.get("slug");
 
 
 // ==========================================
 // START
 // ==========================================
 
-if (!file) {
+if (fileParam) {
 
-    document.getElementById("content").innerHTML =
-        "<h2>Article not found.</h2>";
+    // --------------------------------------
+    // OLD URL SUPPORT
+    // /article.html?file=article.md
+    // --------------------------------------
+
+    loadArticle(fileParam);
+
+} else if (slugParam) {
+
+    // --------------------------------------
+    // NEW PRETTY URL SUPPORT
+    // /deep-dive/article-slug/
+    // --------------------------------------
+
+    findArticleBySlug(slugParam);
 
 } else {
 
-    loadArticle(file);
+    showError(
+        "Article not found."
+    );
+
+}
+
+
+// ==========================================
+// FIND ARTICLE BY SLUG
+// ==========================================
+
+async function findArticleBySlug(slug) {
+
+    try {
+
+        // Get all Deep Dive files from GitHub
+        const response = await fetch(
+            "https://api.github.com/repos/SohailUlla/infonions/contents/content/deepdive",
+            {
+                cache: "no-store"
+            }
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to load article list: " +
+                response.status
+            );
+
+        }
+
+
+        const files =
+            await response.json();
+
+
+        // --------------------------------------
+        // Find matching Markdown file
+        // --------------------------------------
+
+        const article =
+            files.find(file => {
+
+                if (
+                    !file.name ||
+                    !file.name.toLowerCase().endsWith(".md")
+                ) {
+
+                    return false;
+
+                }
+
+
+                // Example:
+                //
+                // 2026-07-28-the-river-is-sending-a-warning.md
+                //
+                // becomes:
+                //
+                // the-river-is-sending-a-warning
+
+                const filenameSlug =
+                    file.name
+                        .replace(
+                            /\.md$/i,
+                            ""
+                        )
+                        .replace(
+                            /^\d{4}-\d{2}-\d{2}-/,
+                            ""
+                        );
+
+
+                return (
+                    filenameSlug.toLowerCase() ===
+                    slug.toLowerCase()
+                );
+
+            });
+
+
+        // --------------------------------------
+        // Article not found
+        // --------------------------------------
+
+        if (!article) {
+
+            console.error(
+                "No article found for slug:",
+                slug
+            );
+
+            showError(
+                "Article not found."
+            );
+
+            return;
+
+        }
+
+
+        // --------------------------------------
+        // Load actual Markdown file
+        // --------------------------------------
+
+        loadArticle(
+            article.name
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Slug lookup error:",
+            error
+        );
+
+        showError(
+            "Unable to load article."
+        );
+
+    }
 
 }
 
@@ -33,64 +179,109 @@ async function loadArticle(file) {
         "https://raw.githubusercontent.com/SohailUlla/infonions/main/content/deepdive/" +
         encodeURIComponent(file);
 
+
     try {
 
-        const res = await fetch(url, {
-            cache: "no-store"
-        });
+        const response =
+            await fetch(
+                url,
+                {
+                    cache: "no-store"
+                }
+            );
 
-        if (!res.ok) {
+
+        if (!response.ok) {
 
             throw new Error(
-                "Article not found: " + res.status
+                "Article not found: " +
+                response.status
             );
 
         }
 
-        const markdown = await res.text();
 
-        // ------------------------------------------
+        const markdown =
+            await response.text();
+
+
+        // --------------------------------------
         // Parse frontmatter
-        // ------------------------------------------
+        // --------------------------------------
 
         const data =
-            parseFrontmatter(markdown);
+            parseFrontmatter(
+                markdown
+            );
 
 
-        // ------------------------------------------
-        // Get article body
-        // ------------------------------------------
+        // --------------------------------------
+        // Remove frontmatter
+        // --------------------------------------
 
         const body =
-            removeFrontmatter(markdown);
+            removeFrontmatter(
+                markdown
+            );
 
 
-        // ------------------------------------------
+        // --------------------------------------
         // Render article
-        // ------------------------------------------
+        // --------------------------------------
 
-        renderArticle(data, body);
+        renderArticle(
+            data,
+            body
+        );
 
 
-        // ------------------------------------------
+        // --------------------------------------
         // SEO
-        // ------------------------------------------
+        // --------------------------------------
 
-        updateSEO(data, file);
-
+        updateSEO(
+            data,
+            file
+        );
 
     }
 
-    catch (err) {
+    catch (error) {
 
         console.error(
             "Article loading error:",
-            err
+            error
         );
 
-        document.getElementById("content").innerHTML = `
-            <h2>Unable to load article.</h2>
-            <p>Please try again later.</p>
+        showError(
+            "Unable to load article."
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// ERROR DISPLAY
+// ==========================================
+
+function showError(message) {
+
+    const content =
+        document.getElementById(
+            "content"
+        );
+
+
+    if (content) {
+
+        content.innerHTML = `
+            <h2>${escapeHTML(message)}</h2>
+            <p>
+                Please check the article URL
+                and try again.
+            </p>
         `;
 
     }
@@ -102,31 +293,46 @@ async function loadArticle(file) {
 // RENDER ARTICLE
 // ==========================================
 
-function renderArticle(data, markdown) {
+function renderArticle(
+    data,
+    markdown
+) {
 
     const category =
-        data.category || "News";
+        data.category ||
+        "News";
+
 
     const title =
-        data.title || "Infonions";
+        data.title ||
+        "Infonions";
+
 
     const excerpt =
-        data.excerpt || "";
+        data.excerpt ||
+        "";
+
 
     const author =
-        data.author || "Infonions Desk";
+        data.author ||
+        "Infonions Desk";
+
 
     const date =
         data.date
             ? formatDate(data.date)
             : "";
 
+
     // ------------------------------------------
-    // Category
+    // CATEGORY
     // ------------------------------------------
 
     const categoryElement =
-        document.getElementById("category");
+        document.getElementById(
+            "category"
+        );
+
 
     if (categoryElement) {
 
@@ -137,11 +343,14 @@ function renderArticle(data, markdown) {
 
 
     // ------------------------------------------
-    // Title
+    // TITLE
     // ------------------------------------------
 
     const titleElement =
-        document.getElementById("title");
+        document.getElementById(
+            "title"
+        );
+
 
     if (titleElement) {
 
@@ -152,11 +361,14 @@ function renderArticle(data, markdown) {
 
 
     // ------------------------------------------
-    // Excerpt
+    // EXCERPT
     // ------------------------------------------
 
     const excerptElement =
-        document.getElementById("excerpt");
+        document.getElementById(
+            "excerpt"
+        );
+
 
     if (excerptElement) {
 
@@ -167,11 +379,14 @@ function renderArticle(data, markdown) {
 
 
     // ------------------------------------------
-    // Author
+    // AUTHOR
     // ------------------------------------------
 
     const authorElement =
-        document.getElementById("author");
+        document.getElementById(
+            "author"
+        );
+
 
     if (authorElement) {
 
@@ -182,11 +397,14 @@ function renderArticle(data, markdown) {
 
 
     // ------------------------------------------
-    // Date
+    // DATE
     // ------------------------------------------
 
     const dateElement =
-        document.getElementById("date");
+        document.getElementById(
+            "date"
+        );
+
 
     if (dateElement) {
 
@@ -197,27 +415,37 @@ function renderArticle(data, markdown) {
 
 
     // ------------------------------------------
-    // Reading time
+    // READING TIME
     // ------------------------------------------
 
     const readingElement =
-        document.getElementById("reading");
+        document.getElementById(
+            "reading"
+        );
+
 
     if (readingElement) {
 
         const words =
             markdown
-                .replace(/\s+/g, " ")
+                .replace(
+                    /\s+/g,
+                    " "
+                )
                 .trim()
                 .split(" ")
                 .filter(Boolean)
                 .length;
 
+
         const minutes =
             Math.max(
                 1,
-                Math.ceil(words / 220)
+                Math.ceil(
+                    words / 220
+                )
             );
+
 
         readingElement.textContent =
             `${minutes} min read`;
@@ -226,20 +454,26 @@ function renderArticle(data, markdown) {
 
 
     // ------------------------------------------
-    // Article Markdown
+    // ARTICLE MARKDOWN
     // ------------------------------------------
 
     const contentElement =
-        document.getElementById("content");
+        document.getElementById(
+            "content"
+        );
+
 
     if (contentElement) {
 
         if (
-            typeof marked !== "undefined"
+            typeof marked !==
+            "undefined"
         ) {
 
             contentElement.innerHTML =
-                marked.parse(markdown);
+                marked.parse(
+                    markdown
+                );
 
         } else {
 
@@ -252,13 +486,16 @@ function renderArticle(data, markdown) {
 
 
     // ------------------------------------------
-    // Featured Image
+    // FEATURED IMAGE
     // ------------------------------------------
 
     if (data.image) {
 
         const hero =
-            document.getElementById("hero");
+            document.getElementById(
+                "hero"
+            );
+
 
         if (hero) {
 
@@ -266,6 +503,12 @@ function renderArticle(data, markdown) {
                 <img
                     src="${escapeAttribute(data.image)}"
                     alt="${escapeAttribute(title)}"
+                    style="
+                        width:100%;
+                        height:100%;
+                        object-fit:cover;
+                        border-radius:22px;
+                    "
                 >
             `;
 
@@ -280,23 +523,30 @@ function renderArticle(data, markdown) {
 // SEO
 // ==========================================
 
-function updateSEO(data, file) {
+function updateSEO(
+    data,
+    file
+) {
 
     const title =
         data.title ||
         "Infonions";
+
 
     const description =
         data.seo_description ||
         data.excerpt ||
         "Fearless Intelligence from Infonions.";
 
+
     const canonical =
-        buildCanonicalURL(file);
+        buildCanonicalURL(
+            file
+        );
 
 
     // ------------------------------------------
-    // Browser title
+    // BROWSER TITLE
     // ------------------------------------------
 
     document.title =
@@ -304,7 +554,7 @@ function updateSEO(data, file) {
 
 
     // ------------------------------------------
-    // Meta description
+    // META DESCRIPTION
     // ------------------------------------------
 
     setMeta(
@@ -314,33 +564,35 @@ function updateSEO(data, file) {
 
 
     // ------------------------------------------
-    // Canonical
+    // CANONICAL
     // ------------------------------------------
 
-    const canonicalElement =
-        document.getElementById("canonical");
-
-    if (canonicalElement) {
-
-        canonicalElement.href =
-            canonical;
-
-    }
+    setCanonical(
+        canonical
+    );
 
 
     // ------------------------------------------
-    // Open Graph
+    // OPEN GRAPH
     // ------------------------------------------
+
+    setProperty(
+        "og:type",
+        "article"
+    );
+
 
     setProperty(
         "og:title",
         `${title} | Infonions`
     );
 
+
     setProperty(
         "og:description",
         description
     );
+
 
     setProperty(
         "og:url",
@@ -352,20 +604,29 @@ function updateSEO(data, file) {
 
         setProperty(
             "og:image",
-            absoluteURL(data.image)
+            absoluteURL(
+                data.image
+            )
         );
 
     }
 
 
     // ------------------------------------------
-    // Twitter / X
+    // TWITTER / X
     // ------------------------------------------
+
+    setMeta(
+        "twitter:card",
+        "summary_large_image"
+    );
+
 
     setMeta(
         "twitter:title",
         `${title} | Infonions`
     );
+
 
     setMeta(
         "twitter:description",
@@ -377,20 +638,73 @@ function updateSEO(data, file) {
 
         setMeta(
             "twitter:image",
-            absoluteURL(data.image)
+            absoluteURL(
+                data.image
+            )
         );
 
     }
 
 
     // ------------------------------------------
-    // Structured data
+    // ARTICLE PUBLISHED DATE
+    // ------------------------------------------
+
+    if (data.date) {
+
+        setMeta(
+            "article:published_time",
+            data.date
+        );
+
+    }
+
+
+    // ------------------------------------------
+    // STRUCTURED DATA
     // ------------------------------------------
 
     createArticleSchema(
         data,
         canonical
     );
+
+}
+
+
+// ==========================================
+// CANONICAL LINK
+// ==========================================
+
+function setCanonical(
+    canonical
+) {
+
+    let element =
+        document.querySelector(
+            'link[rel="canonical"]'
+        );
+
+
+    if (!element) {
+
+        element =
+            document.createElement(
+                "link"
+            );
+
+        element.rel =
+            "canonical";
+
+        document.head.appendChild(
+            element
+        );
+
+    }
+
+
+    element.href =
+        canonical;
 
 }
 
@@ -409,6 +723,7 @@ function createArticleSchema(
             "article-schema"
         );
 
+
     if (oldSchema) {
 
         oldSchema.remove();
@@ -420,10 +735,12 @@ function createArticleSchema(
         data.title ||
         "Infonions";
 
+
     const description =
         data.seo_description ||
         data.excerpt ||
         "";
+
 
     const author =
         data.author ||
@@ -446,6 +763,16 @@ function createArticleSchema(
 
         "url":
             canonical,
+
+        "mainEntityOfPage": {
+
+            "@type":
+                "WebPage",
+
+            "@id":
+                canonical
+
+        },
 
         "author": {
 
@@ -473,6 +800,10 @@ function createArticleSchema(
     };
 
 
+    // ------------------------------------------
+    // DATE
+    // ------------------------------------------
+
     if (data.date) {
 
         schema.datePublished =
@@ -483,6 +814,10 @@ function createArticleSchema(
 
     }
 
+
+    // ------------------------------------------
+    // IMAGE
+    // ------------------------------------------
 
     if (data.image) {
 
@@ -495,19 +830,28 @@ function createArticleSchema(
     }
 
 
+    // ------------------------------------------
+    // INSERT SCHEMA
+    // ------------------------------------------
+
     const script =
         document.createElement(
             "script"
         );
 
+
     script.id =
         "article-schema";
+
 
     script.type =
         "application/ld+json";
 
+
     script.textContent =
-        JSON.stringify(schema);
+        JSON.stringify(
+            schema
+        );
 
 
     document.head.appendChild(
@@ -521,11 +865,16 @@ function createArticleSchema(
 // BUILD CANONICAL URL
 // ==========================================
 
-function buildCanonicalURL(file) {
+function buildCanonicalURL(
+    file
+) {
 
     const slug =
         file
-            .replace(/\.md$/i, "")
+            .replace(
+                /\.md$/i,
+                ""
+            )
             .replace(
                 /^\d{4}-\d{2}-\d{2}-/,
                 ""
@@ -534,7 +883,9 @@ function buildCanonicalURL(file) {
 
     return (
         "https://infonions.com/deep-dive/" +
-        encodeURIComponent(slug) +
+        encodeURIComponent(
+            slug
+        ) +
         "/"
     );
 
@@ -545,7 +896,9 @@ function buildCanonicalURL(file) {
 // FRONTMATTER PARSER
 // ==========================================
 
-function parseFrontmatter(md) {
+function parseFrontmatter(
+    md
+) {
 
     const match =
         md.match(
@@ -563,10 +916,16 @@ function parseFrontmatter(md) {
     const yaml =
         match[1];
 
-    const data = {};
+
+    const data =
+        {};
+
 
     const lines =
-        yaml.split(/\r?\n/);
+        yaml.split(
+            /\r?\n/
+        );
+
 
     let currentKey =
         null;
@@ -582,7 +941,9 @@ function parseFrontmatter(md) {
             lines[i];
 
 
+        // --------------------------------------
         // Ignore empty lines
+        // --------------------------------------
 
         if (!line.trim()) {
 
@@ -591,7 +952,9 @@ function parseFrontmatter(md) {
         }
 
 
-        // Nested SEO description
+        // --------------------------------------
+        // SEO description
+        // --------------------------------------
 
         if (
             line.match(
@@ -607,17 +970,21 @@ function parseFrontmatter(md) {
                     .join(":")
                     .trim();
 
+
             data.seo_description =
                 cleanYamlValue(
                     value
                 );
+
 
             continue;
 
         }
 
 
+        // --------------------------------------
         // Top-level key
+        // --------------------------------------
 
         const matchKey =
             line.match(
@@ -630,6 +997,7 @@ function parseFrontmatter(md) {
             currentKey =
                 matchKey[1]
                     .toLowerCase();
+
 
             const value =
                 matchKey[2].trim();
@@ -672,7 +1040,9 @@ function parseFrontmatter(md) {
 // REMOVE FRONTMATTER
 // ==========================================
 
-function removeFrontmatter(md) {
+function removeFrontmatter(
+    md
+) {
 
     return md.replace(
         /^---\s*[\s\S]*?\s*---\s*/,
@@ -686,10 +1056,15 @@ function removeFrontmatter(md) {
 // YAML VALUE CLEANER
 // ==========================================
 
-function cleanYamlValue(value) {
+function cleanYamlValue(
+    value
+) {
 
-    return value
-        .replace(/^["']|["']$/g, "")
+    return String(value)
+        .replace(
+            /^["']|["']$/g,
+            ""
+        )
         .trim();
 
 }
@@ -717,8 +1092,10 @@ function setMeta(
                 "meta"
             );
 
+
         element.name =
             name;
+
 
         document.head.appendChild(
             element
@@ -755,10 +1132,12 @@ function setProperty(
                 "meta"
             );
 
+
         element.setAttribute(
             "property",
             property
         );
+
 
         document.head.appendChild(
             element
@@ -777,11 +1156,26 @@ function setProperty(
 // ABSOLUTE URL
 // ==========================================
 
-function absoluteURL(url) {
+function absoluteURL(
+    url
+) {
 
     if (
-        url.startsWith("http://") ||
-        url.startsWith("https://")
+        !url
+    ) {
+
+        return "";
+
+    }
+
+
+    if (
+        url.startsWith(
+            "http://"
+        ) ||
+        url.startsWith(
+            "https://"
+        )
     ) {
 
         return url;
@@ -791,14 +1185,17 @@ function absoluteURL(url) {
 
     return (
         "https://infonions.com/" +
-        url.replace(/^\/+/, "")
+        url.replace(
+            /^\/+/,
+            ""
+        )
     );
 
 }
 
 
 // ==========================================
-// DATE
+// DATE FORMATTER
 // ==========================================
 
 function formatDate(
@@ -826,7 +1223,7 @@ function formatDate(
         "en-IN",
         {
             day: "numeric",
-            month: "long",
+            month: "numeric",
             year: "numeric"
         }
     );
