@@ -424,3 +424,10 @@ function loadingUI() {
         </div>
     `;
 }
+setInterval(() => {
+
+    if (currentMode === 'pulse') {
+        renderFeed();
+    }
+
+}, 60 * 1000);
