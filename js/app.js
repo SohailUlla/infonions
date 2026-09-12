@@ -107,50 +107,112 @@ function renderFeed() {
 // ===============================
 // RENDER CARD
 // ===============================
-function renderPulse(md) {
-    const data = parseFrontmatter(md);
-    if (!data.pulse) return;
-
+// Render PULSE mode (short format cards)
+// Pulse stories are publicly visible for 24 hours only.
+function renderPulseFeed() {
     const feed = document.getElementById('pulseFeed');
-    if (!feed) return;
 
-    const card = document.createElement('div');
-    card.className = 'pulse-card';
-    card.style.cursor = "pointer";
+    const now = Date.now();
 
-card.onclick = () => {
-    alert("Full Deep Dive page is not built yet.");
-};
+    // Only show Pulse stories published within the last 24 hours
+    const activePulse = newsData.filter(item => {
+        if (!item.date) return false;
 
-    const wordCount = (data.pulse || "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .split(" ")
-    .filter(Boolean).length;
-    const category = (data.category || '').toLowerCase();
+        const publishedAt = new Date(item.date).getTime();
 
-    const id =
-        data.id ||
-        data.pulse.slice(0, 30).replace(/\s+/g, '-').toLowerCase();
+        if (Number.isNaN(publishedAt)) return false;
 
-    card.innerHTML = `
-        <div class="card-category category-${category}">
-            ${data.category || ""}
-        </div>
-        
-        <div class="pulse-content">${data.pulse}</div>
-        
-        <div class="pulse-meta">
-            <span class="word-count">${wordCount} words</span>
-            <span>${data.time || "Just now"}</span>
-        </div>
-        
-        <div class="action-bar">
-            ${renderSignals(id)}
-        </div>
-    `;
+        const age = now - publishedAt;
 
-    feed.appendChild(card);
+        return age >= 0 && age < 24 * 60 * 60 * 1000;
+    });
+
+    // Newest Pulse stories first
+    activePulse.sort((a, b) => {
+        return new Date(b.date) - new Date(a.date);
+    });
+
+    if (activePulse.length === 0) {
+        feed.innerHTML = `
+            <div class="loading">
+                <p>No fresh Pulse stories right now.</p>
+            </div>
+        `;
+        return;
+    }
+
+    activePulse.forEach(item => {
+        const card = document.createElement('div');
+
+        card.className = 'pulse-card';
+
+        card.onclick = () => viewDeepDive(item.id);
+
+        const wordCount = item.pulse.trim().split(/\s+/).length;
+
+        const publishedAt = new Date(item.date);
+        const ageMs = now - publishedAt.getTime();
+        const ageMinutes = Math.floor(ageMs / 60000);
+
+        let timeText;
+
+        if (ageMinutes < 1) {
+            timeText = 'JUST NOW';
+        } else if (ageMinutes < 60) {
+            timeText = `${ageMinutes}m AGO`;
+        } else {
+            const ageHours = Math.floor(ageMinutes / 60);
+            timeText = `${ageHours}h AGO`;
+        }
+
+        card.innerHTML = `
+            <div class="card-category category-${item.category}">
+                ${item.category}
+            </div>
+
+            <div class="pulse-content">
+                ${item.pulse}
+            </div>
+
+            <div class="pulse-meta">
+                <span class="word-count">
+                    ${wordCount} WORDS
+                </span>
+
+                <span>
+                    ${timeText}
+                </span>
+            </div>
+
+            <div class="action-bar">
+
+                <button
+                    class="action-btn"
+                    onclick="event.stopPropagation(); signal('${item.id}')">
+                    📡 Signal
+                </button>
+
+                <button
+                    class="action-btn"
+                    onclick="event.stopPropagation(); shareItem('${item.id}')">
+                    🔗 Share
+                </button>
+
+                ${item.deepdive ? `
+                    <button
+                        class="action-btn"
+                        style="margin-left:auto;
+                               border-color:var(--electric-blue);
+                               color:var(--electric-blue);">
+                        🔍 Deep Dive →
+                    </button>
+                ` : ''}
+
+            </div>
+        `;
+
+        feed.appendChild(card);
+    });
 }
 // ===============================
 // RENDER DEEP DIVE
