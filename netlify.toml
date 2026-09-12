@@ -1,2 +1,8 @@
 [build]
 publish = "."
+
+[[redirects]]
+from = "/deep-dive/*"
+to = "/article.html?slug=:splat"
+status = 200
+force = true
