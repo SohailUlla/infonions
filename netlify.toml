@@ -1,5 +1,5 @@
 [build]
-publish = "."
+publish = "python scripts/generate-sitemap.py"
 
 [[redirects]]
 from = "/deep-dive/*"
