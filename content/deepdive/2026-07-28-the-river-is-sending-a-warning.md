@@ -1,6 +1,6 @@
 ---
 title: The River Is Sending a Warning
-category: society
+category: disaster
 excerpt: Assam's 2026 floods were not just another monsoon disaster. They
   exposed a dangerous new reality, with floodwaters reaching regions once
   considered safe, revealing how climate change, shifting river dynamics and
