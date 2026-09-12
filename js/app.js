@@ -498,14 +498,16 @@ function renderDeepDive(
     card.style.cursor =
         "pointer";
 
-    card.onclick = () => {
+card.onclick = () => {
 
-        window.location.href =
-            `/article.html?file=${encodeURIComponent(
-                fileName
-            )}`;
+    const slug = fileName
+        .replace(/\.md$/i, "")
+        .replace(/^\d{4}-\d{2}-\d{2}-/, "");
 
-    };
+    window.location.href =
+        `/deep-dive/${slug}/`;
+
+};
 
     const title =
         data.title || "Untitled";
