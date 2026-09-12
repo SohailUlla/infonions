@@ -84,25 +84,39 @@ collections:
         widget: "select"
         options:
           - {label: "Politics 🏛️", value: "politics"}
-- {label: "Economy 💰", value: "economy"}
-- {label: "Tech & AI 🤖", value: "tech"}
-- {label: "Business 🏢", value: "business"}
-- {label: "Science 🔬", value: "science"}
-- {label: "Society 🌍", value: "society"}
-- {label: "Health 🩺", value: "health"}
-- {label: "Education 🎓", value: "education"}
-- {label: "Environment 🌱", value: "environment"}
-- {label: "Energy ⚡", value: "energy"}
-- {label: "Infrastructure 🏗️", value: "infrastructure"}
-- {label: "Law & Justice ⚖️", value: "law"}
-- {label: "Geopolitics 🌐", value: "geopolitics"}
-- {label: "India 🇮🇳", value: "india"}
-- {label: "World 🌎", value: "world"}
-- {label: "Defense 🛡️", value: "defense"}
-- {label: "Culture 🎭", value: "culture"}
-- {label: "Sports 🏆", value: "sports"}
-- {label: "Lifestyle ✨", value: "lifestyle"}
-- {label: "Agriculture 🌾", value: "agriculture"}
+          - {label: "Elections 🗳️", value: "elections"}
+          - {label: "Government 🏛️", value: "government"}
+          - {label: "Economy 💰", value: "economy"}
+          - {label: "Business 📈", value: "business"}
+          - {label: "Markets 📊", value: "markets"}
+          - {label: "Finance 💳", value: "finance"}
+          - {label: "Tech & AI 🤖", value: "tech"}
+          - {label: "Science 🔬", value: "science"}
+          - {label: "Health 🩺", value: "health"}
+          - {label: "Education 🎓", value: "education"}
+          - {label: "Society 🌍", value: "society"}
+          - {label: "Culture 🎭", value: "culture"}
+          - {label: "Lifestyle ✨", value: "lifestyle"}
+          - {label: "Environment 🌱", value: "environment"}
+          - {label: "Climate 🌡️", value: "climate"}
+          - {label: "Energy ⚡", value: "energy"}
+          - {label: "Infrastructure 🏗️", value: "infrastructure"}
+          - {label: "Law & Justice ⚖️", value: "law"}
+          - {label: "Defense 🛡️", value: "defense"}
+          - {label: "Geopolitics 🌐", value: "geopolitics"}
+          - {label: "India 🇮🇳", value: "india"}
+          - {label: "World 🌎", value: "world"}
+          - {label: "Agriculture 🌾", value: "agriculture"}
+          - {label: "Sports 🏆", value: "sports"}
+          - {label: "Media & Journalism 📰", value: "media"}
+          - {label: "Religion & Beliefs 🕊️", value: "religion"}
+          - {label: "Travel ✈️", value: "travel"}
+          - {label: "Space 🚀", value: "space"}
+          - {label: "History 📜", value: "history"}
+          - {label: "Innovation 💡", value: "innovation"}
+          - {label: "Jobs & Careers 💼", value: "careers"}
+          - {label: "Public Policy 📋", value: "policy"}
+          - {label: "Disaster & Risk 🚨", value: "disaster"}
           
       
       - label: "Excerpt"
