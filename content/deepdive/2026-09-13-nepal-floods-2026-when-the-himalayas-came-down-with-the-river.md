@@ -1,10 +1,7 @@
 ---
 title: "Nepal Floods 2026: When the Himalayas Came Down With the River"
 category: disaster
-excerpt: A massive collapse high in the Himalayas triggered a chain of ice,
-  rock, water and debris that devastated communities across Nepal. Weeks later,
-  the rescue continues and the country faces a multibillion-dollar
-  reconstruction challenge.
+excerpt: A massive collapse high in the Himalayas triggered a chain of ice, rock, water and debris that devastated communities across Nepal. Weeks later, the rescue continues and the country faces a multibillion-dollar reconstruction challenge.
 image: /images/chatgpt-image-sep-13-2026-05_52_32-am.png
 imageCaption: A massive Himalayan collapse sends ice, rock and floodwater
   through Nepal’s river valleys, leaving communities devastated as rescue and
